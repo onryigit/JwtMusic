@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace JwtMusicNight.WebApi.Context
+namespace JwtMusic.WebApi.Context
 {
     public class JwtContext : IdentityDbContext<AppUser>
     {

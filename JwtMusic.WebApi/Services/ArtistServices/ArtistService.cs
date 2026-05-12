@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using JwtMusic.WebApi.Dtos;
 using JwtMusic.WebApi.Entities;
-using JwtMusicNight.WebApi.Context;
+using JwtMusic.WebApi.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace JwtMusicNight.WebApi.Services.ArtistServices
+namespace JwtMusic.WebApi.Services.ArtistServices
 {
     public class ArtistService : IArtistService
     {

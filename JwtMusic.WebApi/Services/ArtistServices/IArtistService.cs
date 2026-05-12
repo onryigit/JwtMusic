@@ -1,6 +1,6 @@
 ﻿using JwtMusic.WebApi.Dtos;
 
-namespace JwtMusicNight.WebApi.Services.ArtistServices
+namespace JwtMusic.WebApi.Services.ArtistServices
 {
     public interface IArtistService
     {

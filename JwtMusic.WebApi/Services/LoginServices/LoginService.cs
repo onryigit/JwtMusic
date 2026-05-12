@@ -65,7 +65,7 @@ namespace JwtMusic.WebApi.Services.LoginServices
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
+                audience: jwtSettings["Audi<ence"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpireMinutes"]!)),
                 signingCredentials: credentials

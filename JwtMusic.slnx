@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="JwtMusic.WebUI/JwtMusic.WebUI.csproj" Id="7b452e30-7ef4-4e66-96db-b2f6f2d5baae" />
   <Project Path="JwtMusic.WebApi/JwtMusic.WebApi.csproj" />
 </Solution>

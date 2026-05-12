@@ -20,7 +20,8 @@ namespace JwtMusic.WebApi.Services.RegisterServices
                 Email = dto.Email,
                 Name = dto.Name,
                 Surname = dto.Surname,
-                UserName = dto.Username
+                UserName = dto.Username,
+                ImageUrl = "default"
             };
 
             var result = await _userManager.CreateAsync(appUser, dto.Password);
