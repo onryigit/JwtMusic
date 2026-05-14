@@ -24,7 +24,7 @@ namespace JwtMusic.WebApi.Services.LoginServices
 
         public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.FindByNameAsync(loginDto.Username);
 
             if (user == null)
             {
