@@ -1,32 +1,20 @@
-﻿using JwtMusic.WebUI.Models;
+using JwtMusic.WebUI.Models;
+using JwtMusic.WebUI.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
-namespace JwtMusic.WebUI.Controllers
+namespace JwtMusic.WebUI.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly MusicApiClient _api;
+    public HomeController(MusicApiClient api) => _api = api;
+
+    public async Task<IActionResult> Index(int? genreId)
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("JwtToken"))) return RedirectToAction("SignIn", "Login");
+        var songs = await _api.GetAsync<List<SongViewModel>>($"api/songs{(genreId.HasValue ? $"?genreId={genreId}" : "")}");
+        if (songs is null) return RedirectToAction("SignIn", "Login");
+        var genres = await _api.GetAsync<List<GenreViewModel>>("api/genres") ?? new();
+        return View(new HomeViewModel(songs, genres, genreId));
     }
 }

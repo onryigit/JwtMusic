@@ -6,12 +6,21 @@ namespace JwtMusic.WebApi.Context
 {
     public class JwtContext : IdentityDbContext<AppUser>
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public JwtContext(DbContextOptions<JwtContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            optionsBuilder.UseSqlServer("Server=DESKTOP-66ASQ4V;initial Catalog=JwtMusicNightDb;integrated Security=true");
+            base.OnModelCreating(builder);
+            builder.Entity<Genre>().HasIndex(x => x.Name).IsUnique();
+            builder.Entity<Playlist>().HasMany(x => x.Songs).WithMany(x => x.Playlists);
+            builder.Entity<ListeningHistory>().HasIndex(x => new { x.AppUserId, x.SongId });
         }
 
         public DbSet<Artist> Artists { get; set; }
         public DbSet<Song> Songs { get; set; }
+        public DbSet<Genre> Genres { get; set; }
+        public DbSet<Album> Albums { get; set; }
+        public DbSet<Playlist> Playlists { get; set; }
+        public DbSet<ListeningHistory> ListeningHistory { get; set; }
     }
 }

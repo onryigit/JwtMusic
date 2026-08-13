@@ -1,41 +1,35 @@
-﻿using JwtMusic.WebUI.Dtos;
+using System.Net.Http.Json;
+using JwtMusic.WebUI.Dtos;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Text;
 
-namespace JwtMusic.WebUI.Controllers
+namespace JwtMusic.WebUI.Controllers;
+
+public class LoginController : Controller
 {
-    public class LoginController : Controller
+    private readonly IHttpClientFactory _factory;
+    private readonly IConfiguration _configuration;
+    public LoginController(IHttpClientFactory factory, IConfiguration configuration) => (_factory, _configuration) = (factory, configuration);
+
+    public IActionResult SignIn() => View();
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> SignIn(LoginDto dto)
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-
-        public LoginController(IHttpClientFactory httpClientFactory)
+        var client = _factory.CreateClient();
+        var response = await client.PostAsJsonAsync($"{_configuration["ApiBaseUrl"]}api/Login", dto);
+        if (!response.IsSuccessStatusCode)
         {
-            _httpClientFactory = httpClientFactory;
+            ModelState.AddModelError(string.Empty, "Kullanıcı adı veya parola hatalı.");
+            return View(dto);
         }
+        var token = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
+        HttpContext.Session.SetString("JwtToken", token!.Token);
+        return RedirectToAction("Index", "Home");
+    }
 
-        public IActionResult SignIn()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SignIn(LoginDto loginDto)
-        {
-            var client = _httpClientFactory.CreateClient();
-            var jsonData = JsonConvert.SerializeObject(loginDto);
-            StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var responseMessage = await client.PostAsync("https://localhost:7276/api/Login", stringContent);
-
-            if (responseMessage.IsSuccessStatusCode)
-            {
-                var jsonResponse = await responseMessage.Content.ReadAsStringAsync();
-                var tokenModel = JsonConvert.DeserializeObject<TokenResponseDto>(jsonResponse);
-                HttpContext.Session.SetString("JwtToken", tokenModel.Token);
-                return RedirectToAction("ArtistList", "Artist");
-            }
-
-            return View();
-        }
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction(nameof(SignIn));
     }
 }

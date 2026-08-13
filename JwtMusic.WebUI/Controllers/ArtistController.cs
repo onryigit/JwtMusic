@@ -1,19 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using JwtMusic.WebUI.Models;
+using JwtMusic.WebUI.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace JwtMusic.WebUI.Controllers
+namespace JwtMusic.WebUI.Controllers;
+
+public class ArtistController : Controller
 {
-    public class ArtistController : Controller
+    private readonly MusicApiClient _api;
+    public ArtistController(MusicApiClient api) => _api = api;
+
+    public async Task<IActionResult> ArtistList()
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        var artists = await _api.GetAsync<List<ArtistViewModel>>("api/artists");
+        return artists is null ? RedirectToAction("SignIn", "Login") : View(artists);
+    }
 
-        public ArtistController(IHttpClientFactory httpClientFactory)
-        {
-            _httpClientFactory = httpClientFactory;
-        }
-
-        public async Task<IActionResult> ArtistList()
-        {
-            return View();
-        }
+    public async Task<IActionResult> Detail(int id)
+    {
+        var artist = await _api.GetAsync<ArtistViewModel>($"api/artists/{id}");
+        return artist is null ? NotFound() : View(artist);
     }
 }

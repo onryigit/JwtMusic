@@ -14,10 +14,12 @@
 
         public DateTime ReleaseDate { get; set; }
 
-        public bool IsPremiumOnly { get; set; }
+        public Entities.PackageLevel RequiredPackage { get; set; }
 
         public string Lyrics { get; set; }
 
         public int ArtistId { get; set; }
+        public int AlbumId { get; set; }
+        public int GenreId { get; set; }
     }
 }

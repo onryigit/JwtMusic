@@ -21,7 +21,8 @@ namespace JwtMusic.WebApi.Services.RegisterServices
                 Name = dto.Name,
                 Surname = dto.Surname,
                 UserName = dto.Username,
-                ImageUrl = "default"
+                ImageUrl = "/Bepop/assets/img/a0.jpg",
+                PackageLevel = PackageLevel.Basic
             };
 
             var result = await _userManager.CreateAsync(appUser, dto.Password);

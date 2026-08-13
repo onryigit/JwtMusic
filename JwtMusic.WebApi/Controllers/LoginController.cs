@@ -20,7 +20,7 @@
             public async Task<IActionResult> UserLogin(LoginDto loginDto)
             {
                 var token = await _loginService.LoginAsync(loginDto);
-                return Ok(new { token });
+                return token is null ? Unauthorized(new { message = "Kullanıcı adı veya parola hatalı." }) : Ok(new { token });
             }
         }
     }
