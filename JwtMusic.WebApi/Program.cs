@@ -1,7 +1,6 @@
 using System.Text;
 using JwtMusic.WebApi.Context;
 using JwtMusic.WebApi.Entities;
-using JwtMusic.WebApi.Services.ArtistServices;
 using JwtMusic.WebApi.Services.LoginServices;
 using JwtMusic.WebApi.Services.RegisterServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,10 +38,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ClockSkew = TimeSpan.Zero
     };
 });
-builder.Services.AddScoped<IArtistService, ArtistService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
-builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
@@ -69,7 +66,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<JwtContext>();
-    await context.Database.EnsureCreatedAsync();
+    await context.Database.MigrateAsync();
     await SeedData.InitializeAsync(context);
     AudioFileGenerator.EnsureCreated(app.Environment.ContentRootPath);
 }

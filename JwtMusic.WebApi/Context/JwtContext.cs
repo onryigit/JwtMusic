@@ -14,6 +14,8 @@ namespace JwtMusic.WebApi.Context
             builder.Entity<Genre>().HasIndex(x => x.Name).IsUnique();
             builder.Entity<Playlist>().HasMany(x => x.Songs).WithMany(x => x.Playlists);
             builder.Entity<ListeningHistory>().HasIndex(x => new { x.AppUserId, x.SongId });
+            builder.Entity<Song>().HasOne(x => x.Album).WithMany(x => x.Songs)
+                .HasForeignKey(x => x.AlbumId).OnDelete(DeleteBehavior.NoAction);
         }
 
         public DbSet<Artist> Artists { get; set; }

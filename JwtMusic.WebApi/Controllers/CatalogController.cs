@@ -17,19 +17,17 @@ public class CatalogController : ControllerBase
     public CatalogController(JwtContext context) => _context = context;
 
     [HttpGet("artists")]
-    public async Task<IReadOnlyCollection<ArtistDto>> Artists() => await _context.Artists.AsNoTracking()
-        .Select(x => new ArtistDto(x.ArtistId, x.ArtistName, x.ArtistImageUrl, x.CoverImageUrl,
-            x.Bio, x.Country, x.IsVerified, SongsController.Project(x.Songs.AsQueryable()).ToList()))
-        .ToListAsync();
+    public async Task<IReadOnlyCollection<ArtistDto>> Artists()
+    {
+        var artists = await ArtistQuery().ToListAsync();
+        return artists.Select(ToDto).ToList();
+    }
 
     [HttpGet("artists/{id:int}")]
     public async Task<ActionResult<ArtistDto>> Artist(int id)
     {
-        var artist = await _context.Artists.AsNoTracking().Where(x => x.ArtistId == id)
-            .Select(x => new ArtistDto(x.ArtistId, x.ArtistName, x.ArtistImageUrl, x.CoverImageUrl,
-                x.Bio, x.Country, x.IsVerified, SongsController.Project(x.Songs.AsQueryable()).ToList()))
-            .SingleOrDefaultAsync();
-        return artist is null ? NotFound() : Ok(artist);
+        var artist = await ArtistQuery().SingleOrDefaultAsync(x => x.ArtistId == id);
+        return artist is null ? NotFound() : Ok(ToDto(artist));
     }
 
     [HttpGet("genres")]
@@ -45,9 +43,11 @@ public class CatalogController : ControllerBase
     public async Task<IReadOnlyCollection<PlaylistDto>> Playlists()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        return await _context.Playlists.AsNoTracking().Where(x => x.AppUserId == userId)
-            .Select(x => new PlaylistDto(x.PlaylistId, x.Name, SongsController.Project(x.Songs.AsQueryable()).ToList()))
-            .ToListAsync();
+        var playlists = await _context.Playlists.AsNoTracking().Where(x => x.AppUserId == userId)
+            .Include(x => x.Songs).ThenInclude(x => x.Artist)
+            .Include(x => x.Songs).ThenInclude(x => x.Album)
+            .Include(x => x.Songs).ThenInclude(x => x.Genre).ToListAsync();
+        return playlists.Select(x => new PlaylistDto(x.PlaylistId, x.Name, x.Songs.Select(ToSongDto).ToList())).ToList();
     }
 
     [HttpPost("playlists")]
@@ -68,4 +68,15 @@ public class CatalogController : ControllerBase
             .Select(x => new ProfileDto(x.Id, x.UserName!, x.Name, x.Surname, x.Email!, x.PackageLevel)).SingleAsync();
         return Ok(profile);
     }
+
+    private IQueryable<Artist> ArtistQuery() => _context.Artists.AsNoTracking()
+        .Include(x => x.Songs).ThenInclude(x => x.Album)
+        .Include(x => x.Songs).ThenInclude(x => x.Genre);
+
+    private static ArtistDto ToDto(Artist x) => new(x.ArtistId, x.ArtistName, x.ArtistImageUrl,
+        x.CoverImageUrl, x.Bio, x.Country, x.IsVerified, x.Songs.Select(ToSongDto).ToList());
+
+    private static SongDto ToSongDto(Song x) => new(x.SongId, x.SongName, x.CoverImageUrl, x.Duration,
+        x.ListenCount, x.ReleaseDate, x.RequiredPackage, x.Lyrics, x.ArtistId, x.Artist.ArtistName,
+        x.AlbumId, x.Album.Name, x.GenreId, x.Genre.Name);
 }

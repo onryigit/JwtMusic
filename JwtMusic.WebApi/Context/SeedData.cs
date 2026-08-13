@@ -21,28 +21,50 @@ public static class SeedData
 
     public static async Task InitializeAsync(JwtContext context)
     {
-        if (await context.Songs.AnyAsync()) return;
-        var genres = GenreNames.Select(x => new Genre { Name = x }).ToArray();
-        var artists = ArtistNames.Select((x, i) => new Artist
+        var genres = await context.Genres.ToListAsync();
+        var missingGenres = GenreNames.Except(genres.Select(x => x.Name)).Select(x => new Genre { Name = x }).ToArray();
+        if (missingGenres.Length > 0) { context.AddRange(missingGenres); await context.SaveChangesAsync(); genres.AddRange(missingGenres); }
+
+        var artists = await context.Artists.ToListAsync();
+        var missingArtists = ArtistNames.Where(x => artists.All(a => a.ArtistName != x.Artist))
+            .Select((x, i) => new Artist
+            {
+                ArtistName = x.Artist, Country = x.Country, Bio = $"{x.Artist} müziğin sınırlarını keşfeden bağımsız bir sanatçıdır.",
+                ArtistImageUrl = $"/Bepop/assets/img/a{i}.jpg", CoverImageUrl = $"/Bepop/assets/img/b{i}.jpg",
+                CreatedDate = DateTime.UtcNow.AddYears(-3), IsVerified = i % 2 == 0
+            }).ToList();
+        if (missingArtists.Count > 0) { context.AddRange(missingArtists); await context.SaveChangesAsync(); artists.AddRange(missingArtists); }
+
+        var albums = await context.Albums.ToListAsync();
+        foreach (var artist in artists.Where(x => albums.All(a => a.ArtistId != x.ArtistId)))
+            albums.Add(new Album { Name = $"{artist.ArtistName} Sessions", ArtistId = artist.ArtistId,
+                CoverImageUrl = artist.CoverImageUrl, ReleaseDate = new DateTime(2024, 1, 1) });
+        if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync();
+
+        var demoSongs = await context.Songs.Where(x => SongNames.Contains(x.SongName)).ToListAsync();
+        for (var i = 0; i < demoSongs.Count; i++)
         {
-            ArtistName = x.Artist, Country = x.Country, Bio = $"{x.Artist} müziğin sınırlarını keşfeden bağımsız bir sanatçıdır.",
-            ArtistImageUrl = $"/Bepop/assets/img/a{i}.jpg", CoverImageUrl = $"/Bepop/assets/img/b{i}.jpg",
-            CreatedDate = DateTime.UtcNow.AddYears(-3), IsVerified = i % 2 == 0
-        }).ToArray();
-        context.AddRange(genres); context.AddRange(artists); await context.SaveChangesAsync();
-        var albums = artists.Select((x, i) => new Album
+            var artist = artists[i % artists.Count];
+            demoSongs[i].ArtistId = artist.ArtistId;
+            demoSongs[i].AlbumId = albums.First(x => x.ArtistId == artist.ArtistId).AlbumId;
+        }
+        if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync();
+
+        var existingCount = await context.Songs.CountAsync();
+        if (existingCount >= 20) return;
+        var songs = SongNames.Skip(existingCount).Select((name, offset) =>
         {
-            Name = $"{x.ArtistName} Sessions", ArtistId = x.ArtistId,
-            CoverImageUrl = $"/Bepop/assets/img/b{i}.jpg", ReleaseDate = new DateTime(2024 + i % 3, i % 12 + 1, 1)
-        }).ToArray();
-        context.AddRange(albums); await context.SaveChangesAsync();
-        var songs = SongNames.Select((name, i) => new Song
-        {
-            SongName = name, ArtistId = artists[i % artists.Length].ArtistId, AlbumId = albums[i % albums.Length].AlbumId,
-            GenreId = genres[i % genres.Length].GenreId, RequiredPackage = (PackageLevel)(i % 4),
+            var i = existingCount + offset;
+            var artist = artists[i % artists.Count];
+            var album = albums.First(x => x.ArtistId == artist.ArtistId);
+            return new Song
+            {
+            SongName = name, ArtistId = artist.ArtistId, AlbumId = album.AlbumId,
+            GenreId = genres[i % genres.Count].GenreId, RequiredPackage = (PackageLevel)(i % 4),
             CoverImageUrl = $"/Bepop/assets/img/b{i}.jpg", AudioUrl = $"track-{i + 1:00}.mp3",
             Duration = TimeSpan.FromSeconds(30), ReleaseDate = new DateTime(2023 + i % 4, i % 12 + 1, 1),
             Lyrics = "Bu eser JwtMusic demo kataloğu için hazırlanmıştır."
+            };
         });
         context.AddRange(songs); await context.SaveChangesAsync();
     }

@@ -1,8 +1,28 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@model HomeViewModel
+@{ ViewData["Title"] = "Keşfet"; }
+<div class="page-container py-5">
+    <div class="hero-panel media bg-media mb-5" style="background-image:url('/Bepop/assets/img/b2.jpg')">
+        <div class="hero-shade"><span class="text-primary text-uppercase">JWT güvenceli müzik</span><h1>Ruh haline uygun sesi keşfet.</h1><p>20 parça, dört paket ve dinleme geçmişine göre kişisel öneriler.</p></div>
+    </div>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <h2>Şarkılar</h2>
+        <div class="genre-pills">
+            <a class="btn btn-sm @(Model.SelectedGenreId is null ? "btn-primary" : "btn-outline-light")" asp-action="Index">Tümü</a>
+            @foreach (var genre in Model.Genres) { <a class="btn btn-sm @(Model.SelectedGenreId == genre.GenreId ? "btn-primary" : "btn-outline-light")" asp-action="Index" asp-route-genreId="@genre.GenreId">@genre.Name <small>@genre.SongCount</small></a> }
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var song in Model.Songs)
+        {
+            <div class="col-6 col-md-4 col-lg-3 col-xl-2 mb-4">
+                <article class="song-card">
+                    <a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="media media-1x1">
+                        <span class="media-content" style="background-image:url('@song.CoverImageUrl')"></span>
+                    </a>
+                    <button class="play-fab" onclick="playSong(@song.SongId, '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(song.SongName))', '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(song.ArtistName))', '@song.CoverImageUrl')">▶</button>
+                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small">@song.ArtistName</a><span class="badge badge-package">@song.RequiredPackage</span></div>
+                </article>
+            </div>
+        }
+    </div>
 </div>

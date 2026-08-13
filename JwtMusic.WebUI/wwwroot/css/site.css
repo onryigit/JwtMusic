@@ -1,18 +1,1 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
+html,body{min-height:100%;background:#12111a}.page-content{padding-top:64px;padding-bottom:105px}.page-container{max-width:1280px;margin:auto;padding-left:24px;padding-right:24px}.page-header{z-index:1000;border-bottom:1px solid rgba(255,255,255,.08)}.hero-panel{height:360px;border-radius:18px;overflow:hidden;background-size:cover;background-position:center}.hero-shade{height:100%;padding:70px 8%;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(90deg,rgba(9,8,17,.96),rgba(9,8,17,.15))}.hero-shade h1{font-size:3rem;max-width:600px}.song-card{position:relative}.song-card .media{border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.25)}.song-card .media-content{transition:transform .3s}.song-card:hover .media-content{transform:scale(1.06)}.play-fab{position:absolute;right:10px;top:calc(100% - 85px);width:42px;height:42px;border:0;border-radius:50%;color:#fff;background:#6f42c1;box-shadow:0 5px 16px #000;cursor:pointer}.badge-package{background:rgba(111,66,193,.25);color:#ba9cff;margin-top:8px}.genre-pills{display:flex;gap:8px;flex-wrap:wrap}.artist-avatar{width:150px;height:150px;object-fit:cover;border-radius:50%;box-shadow:0 14px 35px #000}.artist-hero{min-height:330px;border-radius:16px;background-size:cover;background-position:center;display:flex;align-items:end;overflow:hidden}.artist-hero>div{width:100%;padding:40px;background:linear-gradient(0deg,rgba(0,0,0,.95),transparent)}.artist-hero .artist-avatar{width:100px;height:100px}.track-row{display:flex;align-items:center;gap:14px;padding:12px;border-bottom:1px solid rgba(255,255,255,.08)}.track-row img{width:56px;height:56px;border-radius:6px;object-fit:cover}.track-row .flex{display:flex;flex:1;min-width:0;flex-direction:column}.song-detail{display:flex;gap:32px;align-items:center}.song-detail>img{width:300px;height:300px;object-fit:cover;border-radius:14px}.player-bar{position:fixed;z-index:1100;bottom:0;left:0;right:0;height:88px;background:#191824;border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:16px;padding:12px 4%}.player-bar>img{width:62px;height:62px;border-radius:7px;object-fit:cover}.player-meta{display:flex;flex-direction:column;width:220px}.player-bar audio{flex:1;max-height:52px}@media(max-width:767px){.hero-panel{height:280px}.hero-shade h1{font-size:2rem}.song-detail{align-items:flex-start;flex-direction:column}.song-detail>img{width:100%;height:auto}.player-meta{width:100px}.player-bar audio{min-width:0}.navbar .nav-link{padding:.5rem}.artist-avatar{width:110px;height:110px}}
