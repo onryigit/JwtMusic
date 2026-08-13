@@ -37,8 +37,12 @@ public static class SeedData
 
         var albums = await context.Albums.ToListAsync();
         foreach (var artist in artists.Where(x => albums.All(a => a.ArtistId != x.ArtistId)))
-            albums.Add(new Album { Name = $"{artist.ArtistName} Sessions", ArtistId = artist.ArtistId,
-                CoverImageUrl = artist.CoverImageUrl, ReleaseDate = new DateTime(2024, 1, 1) });
+        {
+            var album = new Album { Name = $"{artist.ArtistName} Sessions", ArtistId = artist.ArtistId,
+                CoverImageUrl = artist.CoverImageUrl, ReleaseDate = new DateTime(2024, 1, 1) };
+            albums.Add(album);
+            context.Albums.Add(album);
+        }
         if (context.ChangeTracker.HasChanges()) await context.SaveChangesAsync();
 
         var demoSongs = await context.Songs.Where(x => SongNames.Contains(x.SongName)).ToListAsync();

@@ -22,7 +22,7 @@ namespace JwtMusic.WebApi.Services.LoginServices
             _configuration = configuration;
         }
 
-        public async Task<string> LoginAsync(LoginDto loginDto)
+        public async Task<string?> LoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.Username);
 

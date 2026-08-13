@@ -18,11 +18,11 @@ namespace JwtMusic.WebApi.Context
                 .HasForeignKey(x => x.AlbumId).OnDelete(DeleteBehavior.NoAction);
         }
 
-        public DbSet<Artist> Artists { get; set; }
-        public DbSet<Song> Songs { get; set; }
-        public DbSet<Genre> Genres { get; set; }
-        public DbSet<Album> Albums { get; set; }
-        public DbSet<Playlist> Playlists { get; set; }
-        public DbSet<ListeningHistory> ListeningHistory { get; set; }
+        public DbSet<Artist> Artists { get; set; } = null!;
+        public DbSet<Song> Songs { get; set; } = null!;
+        public DbSet<Genre> Genres { get; set; } = null!;
+        public DbSet<Album> Albums { get; set; } = null!;
+        public DbSet<Playlist> Playlists { get; set; } = null!;
+        public DbSet<ListeningHistory> ListeningHistory { get; set; } = null!;
     }
 }
