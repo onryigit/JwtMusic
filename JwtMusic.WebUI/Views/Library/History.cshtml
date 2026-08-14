@@ -1,9 +1,6 @@
 @model IReadOnlyCollection<HistoryViewModel>
-@{ ViewData["Title"] = "Dinleme Geçmişi"; }
-<div class="page-container py-5">
-    <div class="section-heading"><span class="eyebrow">SENİN RİTMİN</span><h1>Dinleme geçmişi</h1><p>Hangi şarkıyı ne zaman dinlediğin veritabanında tutulur.</p></div>
-    <div class="glass-panel mt-5">
-    @if (!Model.Any()) { <div class="empty-state"><span>♫</span><h3>Henüz bir şarkı dinlemedin</h3><p>Keşfet sayfasından ilk parçanı başlat.</p><a class="btn auth-submit" asp-controller="Home" asp-action="Index">Şarkıları keşfet</a></div> }
-    @foreach (var item in Model) { <div class="track-row"><img src="@item.Song.CoverImageUrl" alt=""/><div class="flex"><a class="text-white" asp-controller="Songs" asp-action="Detail" asp-route-id="@item.Song.SongId">@item.Song.SongName</a><small>@item.Song.ArtistName · @item.Song.GenreName</small></div><time class="text-muted small">@item.ListenedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time><button class="btn btn-sm btn-outline-light js-play" data-id="@item.Song.SongId" data-title="@item.Song.SongName" data-artist="@item.Song.ArtistName" data-cover="@item.Song.CoverImageUrl">▶</button></div> }
-    </div>
-</div>
+@{ ViewData["Title"] = "Dinleme geçmişi"; }
+<div class="page-container py-5"><div class="section-heading"><span class="eyebrow">SON DİNLEDİKLERİN</span><h1>Dinleme geçmişi</h1><p>Yakın zamanda çaldığın şarkılar.</p></div><div class="glass-panel mt-5">
+@if(!Model.Any()){<div class="empty-state"><span>♪</span><h3>Henüz bir şarkı dinlemedin</h3><p>İlk parçanı keşfet sayfasından başlat.</p><a class="btn auth-submit" asp-controller="Home" asp-action="Index">Şarkıları keşfet</a></div>}
+@foreach(var item in Model){<div class="track-row"><img src="@item.Song.CoverImageUrl" alt="@item.Song.SongName kapağı"/><div class="flex"><a class="text-white" asp-controller="Songs" asp-action="Detail" asp-route-id="@item.Song.SongId">@item.Song.SongName</a><small>@item.Song.ArtistName · @item.Song.GenreName</small></div><time class="text-muted small">@item.ListenedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time><button class="btn btn-sm btn-outline-light js-play" data-id="@item.Song.SongId" data-title="@item.Song.SongName" data-artist="@item.Song.ArtistName" data-cover="@item.Song.CoverImageUrl" aria-label="Çal">▶</button></div>}
+</div></div>

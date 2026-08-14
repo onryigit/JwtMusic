@@ -10,6 +10,8 @@
 
         public string AudioUrl { get; set; } = string.Empty;
 
+        public string StoreUrl { get; set; } = string.Empty;
+
         public TimeSpan Duration { get; set; }
 
         public int ListenCount { get; set; }

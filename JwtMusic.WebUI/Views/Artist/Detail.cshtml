@@ -1,12 +1,5 @@
 @model ArtistViewModel
 @{ ViewData["Title"] = Model.ArtistName; }
-<div class="page-container py-5">
-    <section class="artist-hero mb-5" style="background-image:url('@Model.CoverImageUrl')"><div><img src="@Model.ArtistImageUrl" class="artist-avatar" alt="@Model.ArtistName"/><span class="eyebrow d-block mt-3">@(Model.IsVerified ? "DOĞRULANMIŞ SANATÇI" : "SANATÇI")</span><h1>@Model.ArtistName</h1><p>@Model.Bio</p><small>@Model.Country · @Model.Songs.Count şarkı</small></div></section>
-    <h3>Şarkıları</h3>
-    <div class="track-list glass-panel">
-    @foreach(var song in Model.Songs)
-    {
-        <div class="track-row"><img src="@song.CoverImageUrl" alt=""/><div class="flex"><a class="text-white" asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId">@song.SongName</a><small>@song.AlbumName · @song.GenreName</small></div><span class="badge badge-package">@song.RequiredPackage</span><button class="btn btn-primary btn-sm rounded-circle js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl">▶</button></div>
-    }
-    </div>
-</div>
+<div class="page-container py-5"><section class="artist-hero mb-5" style="background-image:url('@Model.CoverImageUrl')"><div><img src="@Model.ArtistImageUrl" class="artist-avatar" alt="@Model.ArtistName"/><span class="eyebrow d-block mt-3">@(Model.IsVerified ? "DOĞRULANMIŞ SANATÇI" : "SANATÇI")</span><h1>@Model.ArtistName</h1><p>@Model.Bio</p><small>@Model.Country · @Model.Songs.Count şarkı</small></div></section><h3>Şarkılar</h3><div class="track-list glass-panel">
+@foreach(var song in Model.Songs){<div class="track-row"><img src="@song.CoverImageUrl" alt="@song.SongName kapağı"/><div class="flex"><a class="text-white" asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId">@song.SongName</a><small>@song.AlbumName · @song.GenreName</small></div><span class="badge badge-package">@song.RequiredPackage</span><button class="btn btn-primary btn-sm rounded-circle js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl" aria-label="Çal">▶</button></div>}
+</div></div>

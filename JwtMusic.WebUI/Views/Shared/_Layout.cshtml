@@ -3,30 +3,34 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] - Bepop Music</title>
+    <meta name="description" content="Bepop müzik keşif platformu" />
+    <title>@ViewData["Title"] · Bepop</title>
     <link rel="stylesheet" href="~/Bepop/assets/css/bootstrap.css" />
     <link rel="stylesheet" href="~/Bepop/assets/css/theme.css" />
     <link rel="stylesheet" href="~/Bepop/assets/css/style.css" />
     <link rel="stylesheet" href="~/Bepop/libs/plyr/dist/plyr.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="layout-column bg-dark text-white">
+<body class="layout-column bg-dark">
     <header class="page-header fixed">
-        <div class="navbar navbar-expand-lg bg-dark px-3 px-lg-4">
-            <a asp-controller="Home" asp-action="Index" class="navbar-brand text-white brand-mark"><span>♫</span> Bepop Music</a>
+        <div class="navbar navbar-expand-lg px-3 px-lg-4">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand text-white">
+                <svg class="brand-disc" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor"/><circle cx="12" cy="12" r="2" stroke="currentColor"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49" stroke="currentColor"/></svg>
+                <span>Bepop</span>
+            </a>
             @if (Context.Session.GetString("JwtToken") is not null)
             {
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav"><span class="text-white">☰</span></button>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-label="Menüyü aç"><i data-feather="menu"></i></button>
                 <div class="collapse navbar-collapse" id="mainNav">
                     <nav class="navbar-nav ml-lg-4">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Keşfet</a>
                         <a class="nav-link" asp-controller="Artist" asp-action="ArtistList">Sanatçılar</a>
                         <a class="nav-link" asp-controller="Library" asp-action="Genres">Türler</a>
                         <a class="nav-link" asp-controller="Library" asp-action="Albums">Albümler</a>
-                        <a class="nav-link" asp-controller="Library" asp-action="Playlists">Playlistler</a>
+                        <a class="nav-link" asp-controller="Library" asp-action="Playlists">Listelerim</a>
                         <a class="nav-link" asp-controller="Library" asp-action="History">Geçmiş</a>
                     </nav>
-                    <div class="user-chip ml-auto"><span class="package-dot"></span><div><strong>@(Context.Session.GetString("FullName") ?? Context.Session.GetString("Username"))</strong><small>@(Context.Session.GetString("Package") ?? "Basic") paket</small></div></div>
+                    <div class="user-chip ml-auto"><span class="package-dot"></span><div><strong>@(Context.Session.GetString("FullName") ?? Context.Session.GetString("Username"))</strong><small>@(Context.Session.GetString("Package") ?? "Basic")</small></div></div>
                     <form asp-controller="Login" asp-action="Logout" method="post" class="ml-3"><button class="btn btn-sm btn-outline-light" type="submit">Çıkış</button></form>
                 </div>
             }
@@ -38,16 +42,18 @@
     {
         <section id="music-player" class="player-bar d-none">
             <img id="player-cover" alt="Albüm kapağı" />
-            <div class="player-meta"><strong id="player-title">—</strong><span id="player-artist">—</span></div>
+            <div class="player-meta"><strong id="player-title">—</strong><span id="player-artist">—</span><small>Önizleme Apple Music aracılığıyla sunulur.</small></div>
             <audio id="audio-player" controls preload="none"></audio>
         </section>
         <div id="packageModal" class="package-modal" aria-hidden="true">
-            <div class="package-dialog"><button type="button" class="modal-x" data-close-modal>×</button><span class="lock-icon">♬</span><h3>Paket yetkisi gerekli</h3><p id="packageMessage">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</p><button class="btn auth-submit" data-close-modal>Anladım</button></div>
+            <div class="package-dialog"><button type="button" class="modal-x" data-close-modal aria-label="Kapat">×</button><span class="lock-icon"><i data-feather="lock"></i></span><h3>Bu parça paketine dahil değil</h3><p id="packageMessage">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</p><button class="btn auth-submit" data-close-modal>Tamam</button></div>
         </div>
     }
     <script src="~/Bepop/libs/jquery/dist/jquery.min.js"></script>
     <script src="~/Bepop/libs/popper.js/dist/umd/popper.min.js"></script>
     <script src="~/Bepop/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/Bepop/libs/feather-icons/dist/feather.min.js"></script>
+    <script>if (window.feather) feather.replace();</script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

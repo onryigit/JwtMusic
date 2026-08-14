@@ -71,11 +71,14 @@ public class SongsController : ControllerBase
         _context.ListeningHistory.Add(new ListeningHistory { AppUserId = userId, SongId = id, ListenedAt = DateTime.UtcNow });
         song.ListenCount++;
         await _context.SaveChangesAsync();
+        if (Uri.TryCreate(song.AudioUrl, UriKind.Absolute, out var previewUrl) && previewUrl.Scheme == Uri.UriSchemeHttps)
+            return Redirect(previewUrl.ToString());
+
         var path = Path.Combine(_environment.ContentRootPath, "Audio", Path.GetFileName(song.AudioUrl));
         return System.IO.File.Exists(path) ? PhysicalFile(path, "audio/mpeg", enableRangeProcessing: true) : NotFound();
     }
 
     internal static IQueryable<SongDto> Project(IQueryable<Song> query) => query.Select(x => new SongDto(
-        x.SongId, x.SongName, x.CoverImageUrl, x.Duration, x.ListenCount, x.ReleaseDate, x.RequiredPackage,
+        x.SongId, x.SongName, x.CoverImageUrl, x.StoreUrl, x.Duration, x.ListenCount, x.ReleaseDate, x.RequiredPackage,
         x.Lyrics, x.ArtistId, x.Artist.ArtistName, x.AlbumId, x.Album.Name, x.GenreId, x.Genre.Name));
 }

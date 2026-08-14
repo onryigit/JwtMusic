@@ -90,7 +90,7 @@ public class CatalogController : ControllerBase
     private static ArtistDto ToDto(Artist x) => new(x.ArtistId, x.ArtistName, x.ArtistImageUrl,
         x.CoverImageUrl, x.Bio, x.Country, x.IsVerified, x.Songs.Select(ToSongDto).ToList());
 
-    private static SongDto ToSongDto(Song x) => new(x.SongId, x.SongName, x.CoverImageUrl, x.Duration,
+    private static SongDto ToSongDto(Song x) => new(x.SongId, x.SongName, x.CoverImageUrl, x.StoreUrl, x.Duration,
         x.ListenCount, x.ReleaseDate, x.RequiredPackage, x.Lyrics, x.ArtistId, x.Artist.ArtistName,
         x.AlbumId, x.Album.Name, x.GenreId, x.Genre.Name);
 }

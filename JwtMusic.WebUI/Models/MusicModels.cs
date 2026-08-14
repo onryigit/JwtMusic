@@ -1,6 +1,6 @@
 namespace JwtMusic.WebUI.Models;
 
-public record SongViewModel(int SongId, string SongName, string CoverImageUrl, TimeSpan Duration,
+public record SongViewModel(int SongId, string SongName, string CoverImageUrl, string StoreUrl, TimeSpan Duration,
     int ListenCount, DateTime ReleaseDate, string RequiredPackage, string Lyrics,
     int ArtistId, string ArtistName, int AlbumId, string AlbumName, int GenreId, string GenreName);
 public record ArtistViewModel(int ArtistId, string ArtistName, string ArtistImageUrl, string CoverImageUrl,

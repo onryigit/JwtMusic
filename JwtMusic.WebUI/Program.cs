@@ -9,7 +9,8 @@ builder.Services.AddDataProtection()
     .SetApplicationName("JwtMusic.WebUI");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<MusicApiClient>(client =>
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

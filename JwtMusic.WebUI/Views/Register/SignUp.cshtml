@@ -1,45 +1,27 @@
 @model JwtMusic.WebUI.Dtos.RegisterDto
-@{ Layout = null; ViewData["Title"] = "Kayıt Ol"; }
+@{ Layout = null; }
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kayıt Ol - Bepop Music</title>
-    <link rel="stylesheet" href="~/Bepop/assets/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/Bepop/assets/css/theme.css" />
-    <link rel="stylesheet" href="~/Bepop/assets/css/style.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hesap oluştur · Bepop</title>
+    <link rel="stylesheet" href="~/Bepop/assets/css/bootstrap.css" /><link rel="stylesheet" href="~/Bepop/assets/css/theme.css" /><link rel="stylesheet" href="~/Bepop/assets/css/style.css" /><link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="auth-body">
+<body class="layout-row bg-dark auth-body">
 <main class="auth-shell">
-    <section class="auth-art" style="background-image:url('/Bepop/assets/img/b7.jpg')">
-        <div class="auth-art-shade">
-            <a class="brand-mark" asp-controller="Login" asp-action="SignIn"><span>♫</span> Bepop Music</a>
-            <div><span class="eyebrow">ÜCRETSİZ BAŞLA</span><h1>Yeni sesleri<br />özgürce keşfet.</h1><p>Yeni hesaplar Basic paketle açılır. Paket bilgisi güvenli biçimde JWT içinde taşınır.</p></div>
-            <small>Tek hesap · Kişisel geçmiş · Akıllı öneriler</small>
-        </div>
-    </section>
-    <section class="auth-form-panel">
-        <div class="auth-card auth-card-wide">
-            <span class="auth-note">♫</span><h2>Hesabını oluştur</h2><p class="text-muted">Birkaç bilgiyle müziğe katıl.</p>
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
-            <form method="post">
-                <div class="form-row">
-                    <div class="form-group col"><label asp-for="Name">Ad</label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger small"></span></div>
-                    <div class="form-group col"><label asp-for="Surname">Soyad</label><input asp-for="Surname" class="form-control" /><span asp-validation-for="Surname" class="text-danger small"></span></div>
-                </div>
-                <div class="form-group"><label asp-for="Username">Kullanıcı adı</label><input asp-for="Username" class="form-control" autocomplete="username" /><span asp-validation-for="Username" class="text-danger small"></span></div>
-                <div class="form-group"><label asp-for="Email">E-posta</label><input asp-for="Email" class="form-control" type="email" autocomplete="email" /><span asp-validation-for="Email" class="text-danger small"></span></div>
-                <div class="form-group"><label asp-for="Password">Parola</label><input asp-for="Password" class="form-control" type="password" autocomplete="new-password" /><small class="form-text text-muted">En az 6 karakter.</small><span asp-validation-for="Password" class="text-danger small d-block"></span></div>
-                <button class="btn auth-submit btn-lg btn-block" type="submit">Ücretsiz Hesap Aç <span>→</span></button>
-            </form>
-            <p class="mt-4 mb-0 text-center text-muted">Zaten üye misin? <a asp-controller="Login" asp-action="SignIn">Giriş yap</a></p>
-        </div>
-    </section>
+    <section class="auth-art"><div class="auth-art-shade"><a class="navbar-brand text-white" asp-controller="Login" asp-action="SignIn"><span class="brand-record">B</span> Bepop</a><div><span class="eyebrow">KEŞFETMEYE BAŞLA</span><h1>Sana eşlik edecek<br />şarkıları bul.</h1><p>Yeni müzikler keşfet, kendi çalma listelerini hazırla ve dinleme geçmişini tek yerde tut.</p></div><small>Kişisel kütüphane · Akıllı öneriler · Her an yanında</small></div></section>
+    <section class="auth-form-panel"><div class="auth-card auth-card-wide">
+        <h2>Hesap oluştur</h2><p class="text-muted mb-4">Birkaç adımda Bepop'a katıl.</p>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
+        <form method="post">
+            <div class="form-row"><div class="form-group col"><label asp-for="Name">Ad</label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger small"></span></div><div class="form-group col"><label asp-for="Surname">Soyad</label><input asp-for="Surname" class="form-control" /><span asp-validation-for="Surname" class="text-danger small"></span></div></div>
+            <div class="form-group"><label asp-for="Username">Kullanıcı adı</label><input asp-for="Username" class="form-control" autocomplete="username" /><span asp-validation-for="Username" class="text-danger small"></span></div>
+            <div class="form-group"><label asp-for="Email">E-posta</label><input asp-for="Email" class="form-control" type="email" autocomplete="email" /><span asp-validation-for="Email" class="text-danger small"></span></div>
+            <div class="form-group"><label asp-for="Password">Parola</label><input asp-for="Password" class="form-control" type="password" autocomplete="new-password" /><small class="form-text text-muted">En az 6 karakter kullanın.</small><span asp-validation-for="Password" class="text-danger small d-block"></span></div>
+            <button class="btn btn-primary btn-block mt-4" type="submit">Hesap oluştur</button>
+        </form>
+        <p class="mt-4 mb-0 text-center text-muted">Zaten hesabın var mı? <a asp-controller="Login" asp-action="SignIn">Giriş yap</a></p>
+    </div></section>
 </main>
-<script src="~/Bepop/libs/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-</body>
-</html>
+<script src="~/Bepop/libs/jquery/dist/jquery.min.js"></script><script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script><script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body></html>

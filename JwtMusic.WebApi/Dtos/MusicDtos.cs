@@ -2,7 +2,7 @@ using JwtMusic.WebApi.Entities;
 
 namespace JwtMusic.WebApi.Dtos;
 
-public record SongDto(int SongId, string SongName, string CoverImageUrl, TimeSpan Duration,
+public record SongDto(int SongId, string SongName, string CoverImageUrl, string StoreUrl, TimeSpan Duration,
     int ListenCount, DateTime ReleaseDate, PackageLevel RequiredPackage, string Lyrics,
     int ArtistId, string ArtistName, int AlbumId, string AlbumName, int GenreId, string GenreName);
 public record ArtistDto(int ArtistId, string ArtistName, string ArtistImageUrl, string CoverImageUrl,

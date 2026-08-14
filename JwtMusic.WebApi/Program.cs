@@ -71,9 +71,20 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<JwtContext>();
     await context.Database.EnsureCreatedAsync();
+    var connection = context.Database.GetDbConnection();
+    await connection.OpenAsync();
+    await using (var check = connection.CreateCommand())
+    {
+        check.CommandText = "SELECT COUNT(*) FROM pragma_table_info('Songs') WHERE name = 'StoreUrl'";
+        if (Convert.ToInt32(await check.ExecuteScalarAsync()) == 0)
+        {
+            await using var alter = connection.CreateCommand();
+            alter.CommandText = "ALTER TABLE Songs ADD COLUMN StoreUrl TEXT NOT NULL DEFAULT ''";
+            await alter.ExecuteNonQueryAsync();
+        }
+    }
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     await SeedData.InitializeAsync(context, userManager);
-    AudioFileGenerator.EnsureCreated(app.Environment.ContentRootPath);
 }
 app.Run();
 

@@ -18,12 +18,23 @@ async function playSong(id, title, artist, cover) {
             return;
         }
         if (response.status === 401) { window.location = '/Login/SignIn'; return; }
-        if (!response.ok) throw new Error('Müzik dosyası yüklenemedi.');
-        const blob = await response.blob();
-        if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
-        currentAudioUrl = URL.createObjectURL(blob);
+        if (!response.ok) throw new Error('Müzik önizlemesi yüklenemedi. İnternet bağlantınızı kontrol edin.');
+
+        const contentType = response.headers.get('content-type') || '';
+        let source;
+        if (contentType.includes('application/json')) {
+            source = (await response.json()).streamUrl;
+            if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+            currentAudioUrl = null;
+        } else {
+            const blob = await response.blob();
+            if (currentAudioUrl) URL.revokeObjectURL(currentAudioUrl);
+            currentAudioUrl = URL.createObjectURL(blob);
+            source = currentAudioUrl;
+        }
+
         const player = document.getElementById('audio-player');
-        player.src = currentAudioUrl;
+        player.src = source;
         document.getElementById('player-title').textContent = title;
         document.getElementById('player-artist').textContent = artist;
         document.getElementById('player-cover').src = cover;

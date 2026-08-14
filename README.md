@@ -1,6 +1,6 @@
 # JwtMusic — Case 10
 
-JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API ve MVC Web UI ayrı projelerdir. Veritabanı ilk çalıştırmada `JwtMusic.WebApi/JwtMusic.db` olarak otomatik oluşur ve 20 MP3 parça, sanatçılar, albümler, türler ile demo kullanıcılar otomatik eklenir.
+JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API ve MVC Web UI ayrı projelerdir. Veritabanı ilk çalıştırmada `JwtMusic.WebApi/JwtMusic.db` olarak otomatik oluşur; 15 yerli ve 15 yabancı popüler parçanın resmi 30 saniyelik Apple Music önizlemesi, albüm kapağı, sanatçı, albüm ve tür bilgileri kataloğa eklenir. İlk katalog kurulumu için internet bağlantısı gerekir.
 
 ## Çalıştırma
 
@@ -33,6 +33,6 @@ Yeni kayıtlar rol ataması yapılmadan Basic paketle oluşturulur. Login yanıt
 2. `POST /api/Login` ile JWT alın.
 3. Swagger veya Postman'de `Authorization: Bearer <token>` başlığını ekleyin.
 4. `GET /api/songs` ile kataloğu alın.
-5. `GET /api/songs/{id}/stream` ile paket kontrolünden geçen MP3'ü oynatın.
+5. `GET /api/songs/{id}/stream` ile paket kontrolünden geçen resmi ses önizlemesini oynatın.
 
 Diğer uçlar: `/api/artists`, `/api/genres`, `/api/albums`, `/api/playlists`, `/api/users/me`, `/api/users/me/history`.
