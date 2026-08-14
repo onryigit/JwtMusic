@@ -12,18 +12,23 @@
 </head>
 <body class="layout-column bg-dark text-white">
     <header class="page-header fixed">
-        <div class="navbar navbar-expand-lg bg-dark">
-            <a asp-controller="Home" asp-action="Index" class="navbar-brand text-white">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor"/><circle cx="12" cy="12" r="2" stroke="currentColor"/><path d="M16.2 7.8a6 6 0 010 8.4M7.8 16.2a6 6 0 010-8.4" stroke="currentColor"/></svg>
-                <span>Bepop Music</span>
-            </a>
+        <div class="navbar navbar-expand-lg bg-dark px-3 px-lg-4">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand text-white brand-mark"><span>♫</span> Bepop Music</a>
             @if (Context.Session.GetString("JwtToken") is not null)
             {
-                <nav class="navbar-nav flex-row ml-auto align-items-center">
-                    <a class="nav-link" asp-controller="Home" asp-action="Index">Keşfet</a>
-                    <a class="nav-link" asp-controller="Artist" asp-action="ArtistList">Sanatçılar</a>
-                    <a class="nav-link text-danger" asp-controller="Login" asp-action="Logout">Çıkış</a>
-                </nav>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav"><span class="text-white">☰</span></button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <nav class="navbar-nav ml-lg-4">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Keşfet</a>
+                        <a class="nav-link" asp-controller="Artist" asp-action="ArtistList">Sanatçılar</a>
+                        <a class="nav-link" asp-controller="Library" asp-action="Genres">Türler</a>
+                        <a class="nav-link" asp-controller="Library" asp-action="Albums">Albümler</a>
+                        <a class="nav-link" asp-controller="Library" asp-action="Playlists">Playlistler</a>
+                        <a class="nav-link" asp-controller="Library" asp-action="History">Geçmiş</a>
+                    </nav>
+                    <div class="user-chip ml-auto"><span class="package-dot"></span><div><strong>@(Context.Session.GetString("FullName") ?? Context.Session.GetString("Username"))</strong><small>@(Context.Session.GetString("Package") ?? "Basic") paket</small></div></div>
+                    <form asp-controller="Login" asp-action="Logout" method="post" class="ml-3"><button class="btn btn-sm btn-outline-light" type="submit">Çıkış</button></form>
+                </div>
             }
         </div>
     </header>
@@ -32,18 +37,16 @@
     @if (Context.Session.GetString("JwtToken") is not null)
     {
         <section id="music-player" class="player-bar d-none">
-            <img id="player-cover" alt="Kapak" />
+            <img id="player-cover" alt="Albüm kapağı" />
             <div class="player-meta"><strong id="player-title">—</strong><span id="player-artist">—</span></div>
             <audio id="audio-player" controls preload="none"></audio>
         </section>
-        <div class="modal fade" id="packageModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-dark border-danger">
-                <div class="modal-header"><h5 class="modal-title">Paket Yetkisi Gerekli</h5><button class="close text-white" data-dismiss="modal">&times;</button></div>
-                <div class="modal-body">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</div>
-            </div></div>
+        <div id="packageModal" class="package-modal" aria-hidden="true">
+            <div class="package-dialog"><button type="button" class="modal-x" data-close-modal>×</button><span class="lock-icon">♬</span><h3>Paket yetkisi gerekli</h3><p id="packageMessage">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</p><button class="btn auth-submit" data-close-modal>Anladım</button></div>
         </div>
     }
     <script src="~/Bepop/libs/jquery/dist/jquery.min.js"></script>
+    <script src="~/Bepop/libs/popper.js/dist/umd/popper.min.js"></script>
     <script src="~/Bepop/libs/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

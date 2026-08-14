@@ -32,14 +32,29 @@ public class SongsController : ControllerBase
     {
         var song = await Project(_context.Songs.AsNoTracking().Where(x => x.SongId == id)).SingleOrDefaultAsync();
         if (song is null) return NotFound();
-        var listenerIds = _context.ListeningHistory.Where(x => x.SongId == id).Select(x => x.AppUserId);
+        var listenerIds = await _context.ListeningHistory.Where(x => x.SongId == id)
+            .Select(x => x.AppUserId).Distinct().ToListAsync();
         var suggestedIds = await _context.ListeningHistory
             .Where(x => x.SongId != id && listenerIds.Contains(x.AppUserId))
             .GroupBy(x => x.SongId).OrderByDescending(x => x.Count()).Select(x => x.Key).Take(6).ToListAsync();
         var recommendations = await Project(_context.Songs.AsNoTracking()
-            .Where(x => x.SongId != id && (suggestedIds.Contains(x.SongId) || x.GenreId == song.GenreId)))
-            .OrderByDescending(x => suggestedIds.Contains(x.SongId)).ThenByDescending(x => x.ListenCount)
-            .Take(6).ToListAsync();
+            .Where(x => suggestedIds.Contains(x.SongId))).ToListAsync();
+        if (recommendations.Count < 6)
+        {
+            var excludedIds = recommendations.Select(x => x.SongId).Append(id).ToList();
+            recommendations.AddRange(await Project(_context.Songs.AsNoTracking()
+                .Where(x => !excludedIds.Contains(x.SongId) && x.GenreId == song.GenreId)
+                .OrderByDescending(x => x.ListenCount))
+                .Take(6 - recommendations.Count).ToListAsync());
+        }
+        if (recommendations.Count < 6)
+        {
+            var excludedIds = recommendations.Select(x => x.SongId).Append(id).ToList();
+            recommendations.AddRange(await Project(_context.Songs.AsNoTracking()
+                .Where(x => !excludedIds.Contains(x.SongId))
+                .OrderByDescending(x => x.ListenCount))
+                .Take(6 - recommendations.Count).ToListAsync());
+        }
         return Ok(new { song, recommendations });
     }
 

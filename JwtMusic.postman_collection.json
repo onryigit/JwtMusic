@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "JwtMusic Case 10",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5155" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Basic",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"basic\",\n  \"password\": \"Music123\"\n}" },
+            "url": "{{baseUrl}}/api/Login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Login başarılı', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('token', pm.response.json().token);"] } }]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Yeni\",\n  \"surname\": \"Kullanıcı\",\n  \"email\": \"yeni@example.com\",\n  \"username\": \"yenikullanici\",\n  \"password\": \"Music123\"\n}" },
+            "url": "{{baseUrl}}/api/Register"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        { "name": "Songs", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs" } },
+        { "name": "Song Detail + Recommendations", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/1" } },
+        { "name": "Stream Basic Song (200)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/1/stream" } },
+        { "name": "Stream Gold Song as Basic (403)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/2/stream" }, "event": [{ "listen": "test", "script": { "exec": ["pm.test('Paket kontrolü 403 döner', () => pm.response.to.have.status(403));"] } }] },
+        { "name": "Artists", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/artists" } },
+        { "name": "Genres", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/genres" } },
+        { "name": "Albums", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/albums" } },
+        { "name": "Listening History", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/users/me/history" } }
+      ]
+    }
+  ]
+}

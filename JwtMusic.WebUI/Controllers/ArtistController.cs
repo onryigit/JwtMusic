@@ -11,12 +11,16 @@ public class ArtistController : Controller
 
     public async Task<IActionResult> ArtistList()
     {
+        if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("JwtToken")))
+            return RedirectToAction("SignIn", "Login");
         var artists = await _api.GetAsync<List<ArtistViewModel>>("api/artists");
         return artists is null ? RedirectToAction("SignIn", "Login") : View(artists);
     }
 
     public async Task<IActionResult> Detail(int id)
     {
+        if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("JwtToken")))
+            return RedirectToAction("SignIn", "Login");
         var artist = await _api.GetAsync<ArtistViewModel>($"api/artists/{id}");
         return artist is null ? NotFound() : View(artist);
     }

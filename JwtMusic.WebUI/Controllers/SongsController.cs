@@ -11,6 +11,8 @@ public class SongsController : Controller
 
     public async Task<IActionResult> Detail(int id)
     {
+        if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("JwtToken")))
+            return RedirectToAction("SignIn", "Login");
         var model = await _api.GetAsync<SongDetailViewModel>($"api/songs/{id}");
         return model is null ? NotFound() : View(model);
     }
@@ -18,6 +20,7 @@ public class SongsController : Controller
     [HttpGet]
     public async Task<IActionResult> Play(int id)
     {
+        if (string.IsNullOrWhiteSpace(HttpContext.Session.GetString("JwtToken"))) return Unauthorized();
         using var response = await _api.StreamAsync(id);
         if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
             return StatusCode(403, await response.Content.ReadAsStringAsync());

@@ -10,10 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 var jwt = builder.Configuration.GetSection("JwtSettings");
 
-builder.Services.AddDbContext<JwtContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var databasePath = Path.Combine(builder.Environment.ContentRootPath, "JwtMusic.db");
+builder.Services.AddDbContext<JwtContext>(options => options.UseSqlite($"Data Source={databasePath}"));
 builder.Services.AddIdentityCore<AppUser>(options =>
     {
         options.User.RequireUniqueEmail = true;
@@ -25,8 +27,7 @@ builder.Services.AddIdentityCore<AppUser>(options =>
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<JwtContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
+    .AddSignInManager();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
@@ -62,14 +63,14 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<JwtContext>();
-    await context.Database.MigrateAsync();
+    await context.Database.EnsureCreatedAsync();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     await SeedData.InitializeAsync(context, userManager);
     AudioFileGenerator.EnsureCreated(app.Environment.ContentRootPath);

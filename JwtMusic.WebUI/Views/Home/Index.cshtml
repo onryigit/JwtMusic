@@ -2,13 +2,13 @@
 @{ ViewData["Title"] = "Keşfet"; }
 <div class="page-container py-5">
     <div class="hero-panel media bg-media mb-5" style="background-image:url('/Bepop/assets/img/b2.jpg')">
-        <div class="hero-shade"><span class="text-primary text-uppercase">JWT güvenceli müzik</span><h1>Ruh haline uygun sesi keşfet.</h1><p>20 parça, dört paket ve dinleme geçmişine göre kişisel öneriler.</p></div>
+        <div class="hero-shade"><span class="eyebrow">JWT GÜVENCELİ MÜZİK</span><h1>Ruh haline uygun sesi keşfet.</h1><p>20 parça, dört üyelik seviyesi ve dinleme geçmişine göre kişisel öneriler.</p><a href="#catalog" class="btn auth-submit align-self-start">Şarkılara göz at</a></div>
     </div>
-    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-        <h2>Şarkılar</h2>
+    <div id="catalog" class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div><span class="eyebrow">KATALOĞUN TAMAMI</span><h2>Şarkılar</h2></div>
         <div class="genre-pills">
-            <a class="btn btn-sm @(Model.SelectedGenreId is null ? "btn-primary" : "btn-outline-light")" asp-action="Index">Tümü</a>
-            @foreach (var genre in Model.Genres) { <a class="btn btn-sm @(Model.SelectedGenreId == genre.GenreId ? "btn-primary" : "btn-outline-light")" asp-action="Index" asp-route-genreId="@genre.GenreId">@genre.Name <small>@genre.SongCount</small></a> }
+            <a class="btn btn-sm @(Model.SelectedGenreId is null ? "auth-submit" : "btn-outline-light")" asp-action="Index">Tümü</a>
+            @foreach (var genre in Model.Genres) { <a class="btn btn-sm @(Model.SelectedGenreId == genre.GenreId ? "auth-submit" : "btn-outline-light")" asp-action="Index" asp-route-genreId="@genre.GenreId">@genre.Name <small>@genre.SongCount</small></a> }
         </div>
     </div>
     <div class="row">
@@ -16,11 +16,9 @@
         {
             <div class="col-6 col-md-4 col-lg-3 col-xl-2 mb-4">
                 <article class="song-card">
-                    <a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="media media-1x1">
-                        <span class="media-content" style="background-image:url('@song.CoverImageUrl')"></span>
-                    </a>
-                    <button class="play-fab" onclick="playSong(@song.SongId, '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(song.SongName))', '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(song.ArtistName))', '@song.CoverImageUrl')">▶</button>
-                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small">@song.ArtistName</a><span class="badge badge-package">@song.RequiredPackage</span></div>
+                    <a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="media media-1x1"><span class="media-content" style="background-image:url('@song.CoverImageUrl')"></span></a>
+                    <button class="play-fab js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl" aria-label="@song.SongName şarkısını çal">▶</button>
+                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small">@song.ArtistName</a><span class="badge badge-package package-@song.RequiredPackage.ToLowerInvariant()">@song.RequiredPackage</span></div>
                 </article>
             </div>
         }

@@ -1,6 +1,12 @@
 using JwtMusic.WebUI.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, ".keys")))
+    .SetApplicationName("JwtMusic.WebUI");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<MusicApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!));
@@ -15,7 +21,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Home/Error"); app.UseHsts(); }
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();

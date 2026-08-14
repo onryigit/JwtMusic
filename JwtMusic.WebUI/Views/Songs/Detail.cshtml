@@ -1,5 +1,16 @@
 @model SongDetailViewModel
 @{ ViewData["Title"] = Model.Song.SongName; }
-<div class="page-container py-5"><div class="row"><div class="col-lg-8"><div class="song-detail"><img src="@Model.Song.CoverImageUrl"/><div><span class="badge badge-package">@Model.Song.RequiredPackage</span><h1>@Model.Song.SongName</h1><a asp-controller="Artist" asp-action="Detail" asp-route-id="@Model.Song.ArtistId">@Model.Song.ArtistName</a><p>@Model.Song.AlbumName · @Model.Song.GenreName · @Model.Song.ListenCount dinleme</p><button class="btn gd-primary text-white" onclick="playSong(@Model.Song.SongId, '@Model.Song.SongName', '@Model.Song.ArtistName', '@Model.Song.CoverImageUrl')">▶ Şimdi Dinle</button></div></div><div class="lyrics mt-5"><h4>Şarkı Bilgisi</h4><p>@Model.Song.Lyrics</p></div></div><aside class="col-lg-4"><h3>Önerilenler</h3><p class="text-muted small">Bu şarkıyı dinleyenlerin tercihlerine göre</p>
-@foreach(var song in Model.Recommendations){<div class="track-row"><img src="@song.CoverImageUrl"/><div class="flex"><a class="text-white" asp-action="Detail" asp-route-id="@song.SongId">@song.SongName</a><small>@song.ArtistName</small></div><button class="btn btn-sm btn-outline-light" onclick="playSong(@song.SongId, '@song.SongName', '@song.ArtistName', '@song.CoverImageUrl')">▶</button></div>}
-</aside></div></div>
+<div class="page-container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="song-detail glass-panel"><img src="@Model.Song.CoverImageUrl" alt="@Model.Song.SongName"/><div><span class="badge badge-package">@Model.Song.RequiredPackage</span><h1>@Model.Song.SongName</h1><a asp-controller="Artist" asp-action="Detail" asp-route-id="@Model.Song.ArtistId">@Model.Song.ArtistName</a><p class="text-muted mt-2">@Model.Song.AlbumName · @Model.Song.GenreName · @Model.Song.ListenCount dinleme</p><button class="btn auth-submit js-play" data-id="@Model.Song.SongId" data-title="@Model.Song.SongName" data-artist="@Model.Song.ArtistName" data-cover="@Model.Song.CoverImageUrl">▶ Şimdi Dinle</button></div></div>
+            <div class="lyrics glass-panel mt-4"><span class="eyebrow">ESER HAKKINDA</span><h4>Şarkı bilgisi</h4><p>@Model.Song.Lyrics</p><small>Yayın tarihi: @Model.Song.ReleaseDate.ToString("dd.MM.yyyy")</small></div>
+        </div>
+        <aside class="col-lg-4 mt-4 mt-lg-0"><span class="eyebrow">SANA ÖZEL</span><h3>Önerilenler</h3><p class="text-muted small">Benzer kullanıcıların dinleme davranışları ve tür yakınlığına göre.</p><div class="glass-panel">
+        @foreach(var song in Model.Recommendations)
+        {
+            <div class="track-row"><img src="@song.CoverImageUrl" alt=""/><div class="flex"><a class="text-white" asp-action="Detail" asp-route-id="@song.SongId">@song.SongName</a><small>@song.ArtistName</small></div><button class="btn btn-sm btn-outline-light js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl">▶</button></div>
+        }
+        </div></aside>
+    </div>
+</div>

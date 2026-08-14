@@ -13,7 +13,7 @@ public class JwtContextFactory : IDesignTimeDbContextFactory<JwtContext>
             .AddJsonFile("appsettings.json")
             .Build();
         var options = new DbContextOptionsBuilder<JwtContext>()
-            .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+            .UseSqlite(configuration.GetConnectionString("DefaultConnection"))
             .Options;
         return new JwtContext(options);
     }
