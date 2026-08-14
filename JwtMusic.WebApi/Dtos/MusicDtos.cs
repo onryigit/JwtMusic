@@ -13,3 +13,4 @@ public record AlbumDto(int AlbumId, string Name, string CoverImageUrl, DateTime 
 public record CreatePlaylistDto(string Name, int[] SongIds);
 public record PlaylistDto(int PlaylistId, string Name, IReadOnlyCollection<SongDto> Songs);
 public record ProfileDto(string Id, string Username, string Name, string Surname, string Email, PackageLevel Package);
+public record HistoryDto(long ListeningHistoryId, DateTime ListenedAt, SongDto Song);

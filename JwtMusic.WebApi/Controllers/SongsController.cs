@@ -37,7 +37,8 @@ public class SongsController : ControllerBase
             .Where(x => x.SongId != id && listenerIds.Contains(x.AppUserId))
             .GroupBy(x => x.SongId).OrderByDescending(x => x.Count()).Select(x => x.Key).Take(6).ToListAsync();
         var recommendations = await Project(_context.Songs.AsNoTracking()
-            .Where(x => suggestedIds.Contains(x.SongId) || (!suggestedIds.Any() && x.GenreId == song.GenreId && x.SongId != id)))
+            .Where(x => x.SongId != id && (suggestedIds.Contains(x.SongId) || x.GenreId == song.GenreId)))
+            .OrderByDescending(x => suggestedIds.Contains(x.SongId)).ThenByDescending(x => x.ListenCount)
             .Take(6).ToListAsync();
         return Ok(new { song, recommendations });
     }

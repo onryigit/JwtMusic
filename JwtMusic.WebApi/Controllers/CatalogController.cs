@@ -53,11 +53,25 @@ public class CatalogController : ControllerBase
     [HttpPost("playlists")]
     public async Task<ActionResult> CreatePlaylist(CreatePlaylistDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest(new { message = "Playlist adı zorunludur." });
         var songs = await _context.Songs.Where(x => dto.SongIds.Contains(x.SongId)).ToListAsync();
         var playlist = new Playlist { Name = dto.Name.Trim(), AppUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!, Songs = songs };
         _context.Playlists.Add(playlist);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(Playlists), new { id = playlist.PlaylistId }, playlist.PlaylistId);
+    }
+
+    [HttpGet("users/me/history")]
+    public async Task<IReadOnlyCollection<HistoryDto>> History()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var history = await _context.ListeningHistory.AsNoTracking()
+            .Where(x => x.AppUserId == userId)
+            .Include(x => x.Song).ThenInclude(x => x.Artist)
+            .Include(x => x.Song).ThenInclude(x => x.Album)
+            .Include(x => x.Song).ThenInclude(x => x.Genre)
+            .OrderByDescending(x => x.ListenedAt).Take(100).ToListAsync();
+        return history.Select(x => new HistoryDto(x.ListeningHistoryId, x.ListenedAt, ToSongDto(x.Song))).ToList();
     }
 
     [HttpGet("users/me")]

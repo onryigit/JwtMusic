@@ -8,3 +8,8 @@ public record ArtistViewModel(int ArtistId, string ArtistName, string ArtistImag
 public record GenreViewModel(int GenreId, string Name, int SongCount);
 public record HomeViewModel(IReadOnlyCollection<SongViewModel> Songs, IReadOnlyCollection<GenreViewModel> Genres, int? SelectedGenreId);
 public record SongDetailViewModel(SongViewModel Song, IReadOnlyCollection<SongViewModel> Recommendations);
+public record AlbumViewModel(int AlbumId, string Name, string CoverImageUrl, DateTime ReleaseDate,
+    int ArtistId, string ArtistName, int SongCount);
+public record HistoryViewModel(long ListeningHistoryId, DateTime ListenedAt, SongViewModel Song);
+public record PlaylistViewModel(int PlaylistId, string Name, IReadOnlyCollection<SongViewModel> Songs);
+public record LibraryViewModel(IReadOnlyCollection<PlaylistViewModel> Playlists, IReadOnlyCollection<SongViewModel> Songs);

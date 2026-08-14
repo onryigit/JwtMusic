@@ -13,7 +13,7 @@ namespace JwtMusic.WebApi.Services.RegisterServices
             _userManager = userManager;
         }
 
-        public async Task<bool> RegisterAsync(RegisterDto dto)
+        public async Task<IdentityResult> RegisterAsync(RegisterDto dto)
         {
             AppUser appUser = new AppUser()
             {
@@ -25,8 +25,7 @@ namespace JwtMusic.WebApi.Services.RegisterServices
                 PackageLevel = PackageLevel.Basic
             };
 
-            var result = await _userManager.CreateAsync(appUser, dto.Password);
-            return result.Succeeded;
+            return await _userManager.CreateAsync(appUser, dto.Password);
         }
     }
 }

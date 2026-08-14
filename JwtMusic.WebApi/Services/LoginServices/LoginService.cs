@@ -24,7 +24,10 @@ namespace JwtMusic.WebApi.Services.LoginServices
 
         public async Task<string?> LoginAsync(LoginDto loginDto)
         {
-            var user = await _userManager.FindByNameAsync(loginDto.Username);
+            var value = loginDto.Username.Trim();
+            var user = value.Contains('@')
+                ? await _userManager.FindByEmailAsync(value)
+                : await _userManager.FindByNameAsync(value);
 
             if (user == null)
             {
@@ -47,8 +50,9 @@ namespace JwtMusic.WebApi.Services.LoginServices
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, appUser.Email),
-                new Claim(ClaimTypes.Name, appUser.UserName),
+                new Claim(ClaimTypes.Email, appUser.Email ?? string.Empty),
+                new Claim(ClaimTypes.Name, appUser.UserName ?? string.Empty),
+                new Claim("fullName", $"{appUser.Name} {appUser.Surname}".Trim()),
                 new Claim(ClaimTypes.Surname, appUser.Surname),
                 new Claim("package", appUser.PackageLevel.ToString())
             };

@@ -19,6 +19,9 @@ builder.Services.AddIdentityCore<AppUser>(options =>
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 6;
         options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireDigit = false;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<JwtContext>()
@@ -67,7 +70,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<JwtContext>();
     await context.Database.MigrateAsync();
-    await SeedData.InitializeAsync(context);
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    await SeedData.InitializeAsync(context, userManager);
     AudioFileGenerator.EnsureCreated(app.Environment.ContentRootPath);
 }
 app.Run();

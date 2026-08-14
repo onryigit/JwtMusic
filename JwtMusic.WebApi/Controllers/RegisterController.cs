@@ -19,9 +19,9 @@ namespace JwtMusicNight.WebApi.Controllers
         public async Task<IActionResult> CreateUser(RegisterDto registerDto)
         {
             var result = await _registerService.RegisterAsync(registerDto);
-            if (!result)
-                return BadRequest("Kayıt başarısız!");
-            return Ok("Başarılı!");
+            if (!result.Succeeded)
+                return BadRequest(new { message = "Kayıt yapılamadı.", errors = result.Errors.Select(x => x.Description) });
+            return Ok(new { message = "Kayıt başarılı." });
         }
     }
 }

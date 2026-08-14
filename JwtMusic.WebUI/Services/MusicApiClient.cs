@@ -24,6 +24,13 @@ public class MusicApiClient
     public async Task<HttpResponseMessage> StreamAsync(int id) =>
         await _client.SendAsync(CreateRequest(HttpMethod.Get, $"api/songs/{id}/stream"), HttpCompletionOption.ResponseHeadersRead);
 
+    public async Task<HttpResponseMessage> PostAsync<T>(string url, T value)
+    {
+        using var request = CreateRequest(HttpMethod.Post, url);
+        request.Content = JsonContent.Create(value, options: JsonOptions);
+        return await _client.SendAsync(request);
+    }
+
     private HttpRequestMessage CreateRequest(HttpMethod method, string url)
     {
         var request = new HttpRequestMessage(method, url);
