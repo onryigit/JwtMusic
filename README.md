@@ -4,6 +4,19 @@ JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API v
 
 ## Çalıştırma
 
+JWT imzalama anahtarı kaynak kodunda tutulmaz. Projeyi ilk kez çalıştırmadan önce geliştirme anahtarını .NET User Secrets'a kaydedin:
+
+```powershell
+$jwtBytes = New-Object byte[] 64
+$jwtRng = [Security.Cryptography.RandomNumberGenerator]::Create()
+$jwtRng.GetBytes($jwtBytes)
+$jwtRng.Dispose()
+$jwtSecret = [Convert]::ToBase64String($jwtBytes)
+dotnet user-secrets set "JwtSettings:Key" $jwtSecret --project JwtMusic.WebApi
+```
+
+Production ortamında aynı değer `JwtSettings__Key` environment variable'ı veya güvenli bir secret store üzerinden verilmelidir.
+
 İki terminal açın:
 
 ```powershell
@@ -36,3 +49,7 @@ Yeni kayıtlar rol ataması yapılmadan Basic paketle oluşturulur. Login yanıt
 5. `GET /api/songs/{id}/stream` ile paket kontrolünden geçen resmi ses önizlemesini oynatın.
 
 Diğer uçlar: `/api/artists`, `/api/genres`, `/api/albums`, `/api/playlists`, `/api/users/me`, `/api/users/me/history`.
+
+## Postman testleri
+
+`JwtMusic.postman_collection.json` koleksiyonunu sırasıyla Collection Runner ile çalıştırın. Koleksiyon dört demo hesabın JWT'sini alır, şarkı kimliklerini paket seviyelerine göre API'den dinamik olarak bulur ve 16 kombinasyonlu paket yetki matrisini test eder. Bu nedenle veritabanındaki şarkı ID'lerinin `1` veya `2` olması gerekmez.

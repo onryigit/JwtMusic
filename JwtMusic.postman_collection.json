@@ -1,49 +1,222 @@
 {
   "info": {
-    "name": "JwtMusic Case 10",
+    "name": "JwtMusic Case 10 - JWT Package Tests",
+    "description": "Collection Runner ile yukarıdan aşağıya çalıştırın. JWT'ler ve paket bazlı şarkı ID'leri çalışma sırasında otomatik bulunur.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:5155" },
-    { "key": "token", "value": "" }
+    { "key": "basicToken", "value": "" },
+    { "key": "goldToken", "value": "" },
+    { "key": "premiumToken", "value": "" },
+    { "key": "elitToken", "value": "" },
+    { "key": "basicSongId", "value": "" },
+    { "key": "goldSongId", "value": "" },
+    { "key": "premiumSongId", "value": "" },
+    { "key": "elitSongId", "value": "" },
+    { "key": "matrixIndex", "value": "0" },
+    { "key": "matrixToken", "value": "" },
+    { "key": "matrixSongId", "value": "" },
+    { "key": "matrixUserPackage", "value": "" },
+    { "key": "matrixSongPackage", "value": "" },
+    { "key": "matrixExpected", "value": "" }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "1 - Authentication",
       "item": [
         {
-          "name": "Login - Basic",
+          "name": "Register - Random User",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": { "exec": [
+                "const suffix = pm.variables.replaceIn('{{$randomUUID}}');",
+                "pm.variables.set('registerUsername', `user_${suffix}`);",
+                "pm.variables.set('registerEmail', `user_${suffix}@example.com`);"
+              ] }
+            },
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Kayıt 200 döner', () => pm.response.to.have.status(200));",
+                "pm.test('Kayıt başarılı mesajı döner', () => pm.expect(pm.response.json().message).to.eql('Kayıt başarılı.'));"
+              ] }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"username\": \"basic\",\n  \"password\": \"Music123\"\n}" },
-            "url": "{{baseUrl}}/api/Login"
-          },
-          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Login başarılı', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('token', pm.response.json().token);"] } }]
-        },
-        {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Yeni\",\n  \"surname\": \"Kullanıcı\",\n  \"email\": \"yeni@example.com\",\n  \"username\": \"yenikullanici\",\n  \"password\": \"Music123\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman\",\n  \"surname\": \"Kullanıcısı\",\n  \"email\": \"{{registerEmail}}\",\n  \"username\": \"{{registerUsername}}\",\n  \"password\": \"Music123\"\n}" },
             "url": "{{baseUrl}}/api/Register"
           }
+        },
+        {
+          "name": "Login - Basic",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Basic login 200 döner', () => pm.response.to.have.status(200));",
+            "const token = pm.response.json().token;",
+            "pm.collectionVariables.set('basicToken', token);",
+            "const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));",
+            "pm.test('JWT package claim Basic', () => pm.expect(payload.package).to.eql('Basic'));"
+          ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"basic\",\n  \"password\": \"Music123\"\n}" }, "url": "{{baseUrl}}/api/Login" }
+        },
+        {
+          "name": "Login - Gold",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Gold login 200 döner', () => pm.response.to.have.status(200));",
+            "const token = pm.response.json().token;",
+            "pm.collectionVariables.set('goldToken', token);",
+            "const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));",
+            "pm.test('JWT package claim Gold', () => pm.expect(payload.package).to.eql('Gold'));"
+          ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"gold\",\n  \"password\": \"Music123\"\n}" }, "url": "{{baseUrl}}/api/Login" }
+        },
+        {
+          "name": "Login - Premium",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Premium login 200 döner', () => pm.response.to.have.status(200));",
+            "const token = pm.response.json().token;",
+            "pm.collectionVariables.set('premiumToken', token);",
+            "const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));",
+            "pm.test('JWT package claim Premium', () => pm.expect(payload.package).to.eql('Premium'));"
+          ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"premium\",\n  \"password\": \"Music123\"\n}" }, "url": "{{baseUrl}}/api/Login" }
+        },
+        {
+          "name": "Login - Elit",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Elit login 200 döner', () => pm.response.to.have.status(200));",
+            "const token = pm.response.json().token;",
+            "pm.collectionVariables.set('elitToken', token);",
+            "const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));",
+            "pm.test('JWT package claim Elit', () => pm.expect(payload.package).to.eql('Elit'));"
+          ] } }],
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"elit\",\n  \"password\": \"Music123\"\n}" }, "url": "{{baseUrl}}/api/Login" }
         }
       ]
     },
     {
-      "name": "Catalog",
+      "name": "2 - Dynamic Catalog Setup",
       "item": [
-        { "name": "Songs", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs" } },
-        { "name": "Song Detail + Recommendations", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/1" } },
-        { "name": "Stream Basic Song (200)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/1/stream" } },
-        { "name": "Stream Gold Song as Basic (403)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/songs/2/stream" }, "event": [{ "listen": "test", "script": { "exec": ["pm.test('Paket kontrolü 403 döner', () => pm.response.to.have.status(403));"] } }] },
-        { "name": "Artists", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/artists" } },
-        { "name": "Genres", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/genres" } },
-        { "name": "Albums", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/albums" } },
-        { "name": "Listening History", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/api/users/me/history" } }
+        {
+          "name": "Discover Package Song IDs",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Şarkı listesi 200 döner', () => pm.response.to.have.status(200));",
+            "const songs = pm.response.json();",
+            "pm.collectionVariables.set('matrixIndex', '0');",
+            "pm.test('Katalog yaklaşık 20 veya daha fazla şarkı içerir', () => pm.expect(songs.length).to.be.at.least(20));",
+            "['Basic', 'Gold', 'Premium', 'Elit'].forEach(packageName => {",
+            "  const song = songs.find(item => item.requiredPackage === packageName);",
+            "  pm.test(`${packageName} paketinde şarkı var`, () => pm.expect(song, `${packageName} şarkısı bulunamadı`).to.exist);",
+            "  if (song) pm.collectionVariables.set(`${packageName.toLowerCase()}SongId`, String(song.songId));",
+            "});"
+          ] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/songs" }
+        },
+        {
+          "name": "Dynamic Song Detail + Recommendations",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Şarkı detayı 200 döner', () => pm.response.to.have.status(200));",
+            "const body = pm.response.json();",
+            "pm.test('Şarkı ve öneriler döner', () => { pm.expect(body.song).to.be.an('object'); pm.expect(body.recommendations).to.be.an('array'); });"
+          ] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/songs/{{basicSongId}}" }
+        }
       ]
+    },
+    {
+      "name": "3 - JWT Security",
+      "item": [
+        {
+          "name": "Songs Without Token - 401",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Tokensız istek 401 döner', () => pm.response.to.have.status(401));"] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/songs" }
+        },
+        {
+          "name": "Songs With Invalid Token - 401",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Geçersiz token 401 döner', () => pm.response.to.have.status(401));"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer invalid.jwt.token" }], "url": "{{baseUrl}}/api/songs" }
+        }
+      ]
+    },
+    {
+      "name": "4 - Catalog Smoke Tests",
+      "item": [
+        {
+          "name": "Artists",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Artistler 200 ve dolu döner', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty; });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/artists" }
+        },
+        {
+          "name": "Genres",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Türler 200 ve dolu döner', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty; });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/genres" }
+        },
+        {
+          "name": "Albums",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Albümler 200 ve dolu döner', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty; });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/albums" }
+        },
+        {
+          "name": "Listening History",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Dinleme geçmişi 200 ve dizi döner', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] } }],
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{basicToken}}" }], "url": "{{baseUrl}}/api/users/me/history" }
+        }
+      ]
+    },
+    {
+      "name": "5 - Package Authorization Matrix (16 cases)",
+      "description": "Collection Runner bu isteği 16 kez çalıştırır: dört kullanıcı paketi × dört şarkı paketi.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "exec": [
+            "const packages = ['Basic', 'Gold', 'Premium', 'Elit'];",
+            "let index = Number(pm.collectionVariables.get('matrixIndex') || 0);",
+            "if (index < 0 || index > 15) index = 0;",
+            "const userIndex = Math.floor(index / packages.length);",
+            "const songIndex = index % packages.length;",
+            "const userPackage = packages[userIndex];",
+            "const songPackage = packages[songIndex];",
+            "pm.collectionVariables.set('matrixUserPackage', userPackage);",
+            "pm.collectionVariables.set('matrixSongPackage', songPackage);",
+            "pm.collectionVariables.set('matrixToken', pm.collectionVariables.get(`${userPackage.toLowerCase()}Token`));",
+            "pm.collectionVariables.set('matrixSongId', pm.collectionVariables.get(`${songPackage.toLowerCase()}SongId`));",
+            "pm.collectionVariables.set('matrixExpected', userIndex >= songIndex ? 'allowed' : 'forbidden');"
+          ] }
+        },
+        {
+          "listen": "test",
+          "script": { "exec": [
+            "const userPackage = pm.collectionVariables.get('matrixUserPackage');",
+            "const songPackage = pm.collectionVariables.get('matrixSongPackage');",
+            "const expected = pm.collectionVariables.get('matrixExpected');",
+            "const label = `${userPackage} kullanıcı -> ${songPackage} şarkı`;",
+            "if (expected === 'allowed') {",
+            "  pm.test(`${label}: erişim başarılı`, () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));",
+            "} else {",
+            "  pm.test(`${label}: 403 Forbidden`, () => pm.response.to.have.status(403));",
+            "  pm.test(`${label}: yükseltme mesajı`, () => pm.expect(pm.response.json().message).to.include('Lütfen paketinizi yükseltin'));",
+            "}",
+            "const nextIndex = Number(pm.collectionVariables.get('matrixIndex')) + 1;",
+            "if (nextIndex < 16) {",
+            "  pm.collectionVariables.set('matrixIndex', String(nextIndex));",
+            "  pm.execution.setNextRequest('5 - Package Authorization Matrix (16 cases)');",
+            "} else {",
+            "  pm.collectionVariables.set('matrixIndex', '0');",
+            "  pm.execution.setNextRequest(null);",
+            "}"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{matrixToken}}" }],
+        "url": "{{baseUrl}}/api/songs/{{matrixSongId}}/stream"
+      },
+      "protocolProfileBehavior": { "followRedirects": false }
     }
   ]
 }

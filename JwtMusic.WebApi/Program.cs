@@ -13,6 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 var jwt = builder.Configuration.GetSection("JwtSettings");
+var jwtKey = jwt["Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetByteCount(jwtKey) < 32)
+    throw new InvalidOperationException(
+        "JwtSettings:Key yapılandırılmalıdır ve en az 32 bayt olmalıdır. " +
+        "Development ortamında .NET User Secrets, diğer ortamlarda environment variable kullanın.");
 
 var databasePath = Path.Combine(builder.Environment.ContentRootPath, "JwtMusic.db");
 builder.Services.AddDbContext<JwtContext>(options => options.UseSqlite($"Data Source={databasePath}"));
@@ -38,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwt["Issuer"],
         ValidAudience = jwt["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
         ClockSkew = TimeSpan.Zero
     };
 });
