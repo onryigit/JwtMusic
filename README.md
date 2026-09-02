@@ -1,6 +1,6 @@
 # JwtMusic — Case 10
 
-JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API ve MVC Web UI ayrı projelerdir. Veritabanı ilk çalıştırmada `JwtMusic.WebApi/JwtMusic.db` olarak otomatik oluşur; 15 yerli ve 15 yabancı popüler parçanın resmi 30 saniyelik Apple Music önizlemesi, albüm kapağı, sanatçı, albüm ve tür bilgileri kataloğa eklenir. İlk katalog kurulumu için internet bağlantısı gerekir.
+JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API ve MVC Web UI ayrı projelerdir. Veritabanı ilk çalıştırmada `JwtMusic.WebApi/JwtMusic.db` olarak otomatik oluşur; 30 yerli ve 30 yabancı popüler parçanın resmi 30 saniyelik Apple Music önizlemesi, albüm kapağı, sanatçı, albüm ve tür bilgileri kataloğa eklenir. İlk katalog kurulumu için internet bağlantısı gerekir.
 
 ## Çalıştırma
 
