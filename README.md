@@ -168,25 +168,19 @@ JwtMusic/
 - Veritabanı ve Data Protection anahtarları Git kapsamı dışında tutulur.
 - Yerel ses dosyaları yalnızca güvenli dosya adı çözümlemesi üzerinden sunulur.
 
-## Demo Hesapları
-
-| Kullanıcı adı | Parola | Paket |
-|---|---|---|
-| `basic` | `Music123` | Basic |
-| `gold` | `Music123` | Gold |
-| `premium` | `Music123` | Premium |
-| `elit` | `Music123` | Elit |
-
-Yeni kayıt olan kullanıcılar Basic paketle başlar. Demo hesapları, farklı üyelik seviyelerinin erişim matrisini hızlı biçimde test etmek için seed aşamasında oluşturulur.
-
 ## API Testleri
 
 [JwtMusic.postman_collection.json](JwtMusic.postman_collection.json) koleksiyonu; demo kullanıcıların JWT'lerini otomatik alır, şarkıları paket seviyelerine göre dinamik olarak seçer ve 16 kombinasyonlu yetkilendirme matrisini doğrular.
 
-## Lisans ve Atıf
-
-Josh Woodward'a ait 20 tam uzunluktaki kayıt [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) lisansıyla kullanılmaktadır. Kayıtlarda değişiklik yapılmamıştır.
-
-Kaynak: [joshwoodward.com](https://www.joshwoodward.com/)
-
-Projenin kaynak kodu için ayrıca bir lisans belirtilmediği sürece tüm haklar saklıdır.
+<img width="1904" height="951" alt="d2" src="https://github.com/user-attachments/assets/8fad07b8-c668-4cc6-8f9d-c82408026704" />
+<img width="1917" height="951" alt="d11" src="https://github.com/user-attachments/assets/b4df0763-c063-455c-8dbd-0d1cb4f525f3" />
+<img width="1902" height="954" alt="d333" src="https://github.com/user-attachments/assets/5dcab3d0-d816-40da-bcd4-d148081f9973" />
+<img width="1904" height="951" alt="d3" src="https://github.com/user-attachments/assets/f987ba4e-2bc4-4830-a79f-fe6182ed0ab6" />
+<img width="1913" height="949" alt="d4444444" src="https://github.com/user-attachments/assets/c0d65eee-8113-4989-bf3f-76d96097e68c" />
+<img width="1915" height="948" alt="d22222" src="https://github.com/user-attachments/assets/3b7a5725-66cd-46a4-80a1-08cd9dd524f2" />
+<img width="1893" height="950" alt="d4" src="https://github.com/user-attachments/assets/200c8085-ef68-4586-b314-8dce86b126ea" />
+<img width="1904" height="957" alt="d6" src="https://github.com/user-attachments/assets/aab3dbda-9b66-4410-adf2-79e79b93010b" />
+<img width="1904" height="949" alt="d5" src="https://github.com/user-attachments/assets/60af1f4c-8cb8-446c-8f12-f72401c60317" />
+<img width="1905" height="947" alt="d9" src="https://github.com/user-attachments/assets/b9e5d1fe-b350-4d0d-a775-8e60f52248aa" />
+<img width="1912" height="947" alt="d8" src="https://github.com/user-attachments/assets/423d4989-88f5-4a79-9b22-f035768b596c" />
+<img width="1904" height="950" alt="d7" src="https://github.com/user-attachments/assets/2ee9968d-a7ad-4700-9c1c-950dd35a9004" />
