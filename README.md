@@ -1,55 +1,193 @@
-# JwtMusic — Case 10
+# Reverb — JWT Tabanlı Müzik Platformu
 
-JWT ve paket bazlı yetkilendirme kullanan iki katmanlı müzik platformu. API ve MVC Web UI ayrı projelerdir. Veritabanı ilk çalıştırmada `JwtMusic.WebApi/JwtMusic.db` olarak otomatik oluşur; 30 yerli ve 30 yabancı popüler parçanın resmi 30 saniyelik Apple Music önizlemesi, albüm kapağı, sanatçı, albüm ve tür bilgileri kataloğa eklenir. İlk katalog kurulumu için internet bağlantısı gerekir.
+Reverb; kullanıcıların şarkı keşfedebildiği, sanatçı ve albümleri inceleyebildiği, çalma listeleri oluşturabildiği ve üyelik seviyelerine göre müzik dinleyebildiği modern bir müzik platformudur.
 
-## Çalıştırma
+Proje, birbirinden ayrılmış **ASP.NET Core Web API** ve **ASP.NET Core MVC** uygulamalarından oluşur. Kullanıcı kimliği ve üyelik bilgileri JWT claim'leriyle taşınırken katalog, dinleme geçmişi ve kişisel listeler Entity Framework Core üzerinden yönetilir.
 
-JWT imzalama anahtarı kaynak kodunda tutulmaz. Projeyi ilk kez çalıştırmadan önce geliştirme anahtarını .NET User Secrets'a kaydedin:
+> Bu proje M&Y Yazılım Eğitim Akademi Danışmanlık bünyesinde, Murat Yücedağ'ın mentörlüğünde geliştirilmiştir.
 
-```powershell
-$jwtBytes = New-Object byte[] 64
-$jwtRng = [Security.Cryptography.RandomNumberGenerator]::Create()
-$jwtRng.GetBytes($jwtBytes)
-$jwtRng.Dispose()
-$jwtSecret = [Convert]::ToBase64String($jwtBytes)
-dotnet user-secrets set "JwtSettings:Key" $jwtSecret --project JwtMusic.WebApi
+## Öne Çıkan Özellikler
+
+- JWT tabanlı kayıt, giriş ve yetkilendirme
+- ASP.NET Core Identity ile güvenli kullanıcı yönetimi
+- Basic, Gold, Premium ve Elit üyelik seviyeleri
+- Üyelik seviyesine göre sunucu tarafında şarkı erişim kontrolü
+- Şarkı, sanatçı, albüm ve tür bazlı katalog
+- iTunes Search API üzerinden gerçek katalog bilgileri ve resmî önizlemeler
+- Creative Commons lisanslı 20 tam uzunlukta parça
+- HTTP range processing destekli yerel MP3 streaming
+- Oynat/duraklat, önceki/sonraki, zaman çizelgesi ve ses kontrolleri
+- Kullanıcıya özel çalma listeleri
+- Dinleme geçmişi ve dinlenme sayacı
+- Dinleme davranışı ve tür benzerliğine dayalı öneriler
+- Oturum içerisinden güvenli paket yükseltme ve JWT yenileme
+- Responsive, modern ve kullanıcı dostu arayüz
+- Swagger ve Postman ile test edilebilir REST API
+
+## Mimari Akış
+
+```mermaid
+flowchart LR
+    User([Kullanıcı]) --> Browser[Tarayıcı]
+
+    subgraph UI[JwtMusic.WebUI — ASP.NET Core MVC]
+        Browser --> Controllers[MVC Controllers]
+        Controllers --> Views[Razor Views]
+        Controllers <--> Session[(Session<br/>JWT & kullanıcı bilgileri)]
+        Controllers --> Client[Typed HttpClient]
+        Views --> Player[JavaScript Müzik Oynatıcı]
+    end
+
+    Client -->|REST + Bearer JWT| API
+    Player -->|Şarkı isteği| StreamProxy[MVC Stream Proxy]
+    StreamProxy -->|Bearer JWT| API
+
+    subgraph Backend[JwtMusic.WebApi — ASP.NET Core Web API]
+        API[API Controllers] --> Auth[JWT Bearer Authentication]
+        Auth --> Access{Paket seviyesi<br/>yeterli mi?}
+        API --> Services[Login, Register & Token Services]
+        API --> EF[Entity Framework Core]
+        Services --> Identity[ASP.NET Core Identity]
+        Identity --> EF
+        Access -->|Evet| Stream[Audio Stream Endpoint]
+        Access -->|Hayır| Forbidden[403 Forbidden]
+    end
+
+    EF --> DB[(SQLite Database)]
+    Stream -->|Tam parça| Audio[(Yerel MP3 Arşivi)]
+    Stream -->|Önizleme| Preview[iTunes Preview URL]
+    Seed[SeedData] --> iTunes[iTunes Search API]
+    Seed --> DB
+    iTunes --> Seed
 ```
 
-Production ortamında aynı değer `JwtSettings__Key` environment variable'ı veya güvenli bir secret store üzerinden verilmelidir.
+## İstek Yaşam Döngüsü
 
-İki terminal açın:
+1. Kullanıcı MVC arayüzü üzerinden giriş yapar.
+2. Web UI, giriş bilgilerini Web API'ye gönderir ve imzalı JWT alır.
+3. Token ve kullanıcı bilgileri güvenli sunucu oturumunda saklanır.
+4. Sonraki API isteklerine `Bearer` token otomatik olarak eklenir.
+5. Şarkı oynatma isteğinde API, JWT içerisindeki `PlanTier` claim'ini kontrol eder.
+6. Yetkili kullanıcıya resmî önizleme URL'si veya range destekli yerel MP3 akışı sunulur.
+7. Başarılı dinlemeler geçmişe kaydedilir ve dinlenme sayısı artırılır.
 
-```powershell
-dotnet run --project JwtMusic.WebApi
-dotnet run --project JwtMusic.WebUI
+## Üyelik ve Yetkilendirme
+
+| Paket | Seviye | Erişim |
+|---|---:|---|
+| Basic | 1 | Basic içerikler |
+| Gold | 2 | Basic ve Gold içerikler |
+| Premium | 3 | Basic, Gold ve Premium içerikler |
+| Elit | 4 | Tüm içerikler |
+
+Üst paketler kendilerinden düşük seviyedeki bütün içeriklere erişebilir. Yetki kontrolü yalnızca arayüzde değil, doğrudan streaming endpoint'inde uygulanır. Yetersiz paketle yapılan istekler `403 Forbidden` döndürür.
+
+Creative Commons lisanslı 20 tam uzunluktaki parça bütün üyelik seviyelerinde dinlenebilir.
+
+## Müzik Kataloğu
+
+Katalog iki farklı ses kaynağını birlikte destekler:
+
+- **64 popüler parça:** iTunes Search API üzerinden alınan sanatçı, albüm, kapak ve resmî ses önizlemeleri
+- **20 tam uzunlukta parça:** Josh Woodward'ın *33⅓* ve *The Wake* albümlerinden CC BY 4.0 lisanslı MP3 kayıtları
+
+Tam uzunluktaki kayıtlar proje içerisinde barındırılır ve ASP.NET Core `PhysicalFile` sonucu ile `enableRangeProcessing` etkin şekilde sunulur. Böylece tarayıcı parçayı tamamen indirmeden oynatabilir ve zaman çizelgesi üzerinde ileri-geri sarma yapabilir.
+
+Her tam parçanın detay sayfasında sanatçı, kaynak sayfası ve lisans bağlantısı gösterilir. Ayrıntılı atıf bilgileri [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) dosyasında bulunur.
+
+## Öneri Sistemi
+
+Parça detayındaki öneriler üç aşamalı olarak oluşturulur:
+
+1. Aynı parçayı dinleyen kullanıcıların dinlediği diğer parçalar belirlenir.
+2. Eksik kalan öneriler aynı müzik türündeki popüler parçalarla tamamlanır.
+3. Son aşamada genel dinlenme sayılarına göre alternatifler eklenir.
+
+Bu yaklaşım, dinleme geçmişi henüz oluşmamış yeni kullanıcılar için de öneri üretebilir.
+
+## Teknolojiler
+
+| Katman | Teknolojiler |
+|---|---|
+| Backend | ASP.NET Core Web API, C#, .NET 10 |
+| Frontend | ASP.NET Core MVC, Razor Views, JavaScript, Bootstrap |
+| Veri erişimi | Entity Framework Core, SQLite |
+| Kimlik ve güvenlik | ASP.NET Core Identity, JWT Bearer, HMAC-SHA256, Anti-forgery Token |
+| Entegrasyon | iTunes Search API, Typed HttpClient |
+| Dokümantasyon ve test | Swagger / OpenAPI, Postman |
+| Medya | HTML5 Audio, HTTP Range Processing, MP3 Streaming |
+
+## Proje Yapısı
+
+```text
+JwtMusic/
+├── JwtMusic.WebApi/
+│   ├── Audio/                  # Tam uzunluktaki lisanslı MP3 dosyaları
+│   ├── Context/                # DbContext ve katalog seed işlemleri
+│   ├── Controllers/            # REST API endpoint'leri
+│   ├── Dtos/                   # API veri transfer modelleri
+│   ├── Entities/               # Veritabanı varlıkları
+│   └── Services/               # Login, kayıt ve JWT servisleri
+├── JwtMusic.WebUI/
+│   ├── Controllers/            # MVC istek akışı
+│   ├── Models/                 # View modelleri
+│   ├── Services/               # API istemcisi ve oturum yönetimi
+│   ├── Views/                  # Razor arayüzleri
+│   └── wwwroot/                # CSS, JavaScript ve görseller
+├── JwtMusic.postman_collection.json
+├── THIRD-PARTY-NOTICES.md
+└── JwtMusic.slnx
 ```
 
-- Web UI: `http://localhost:5220`
-- Swagger: `http://localhost:5155/swagger`
+## API Özeti
 
-Visual Studio kullanıyorsanız iki projeyi birlikte başlangıç projesi olarak seçebilirsiniz.
+| Metot | Endpoint | Açıklama |
+|---|---|---|
+| `POST` | `/api/register` | Yeni kullanıcı oluşturur |
+| `POST` | `/api/login` | JWT üretir |
+| `GET` | `/api/songs` | Şarkı kataloğunu listeler ve filtreler |
+| `GET` | `/api/songs/{id}` | Parça detayını ve önerileri getirir |
+| `GET` | `/api/songs/{id}/stream` | Yetki kontrollü ses akışı sağlar |
+| `GET` | `/api/artists` | Sanatçıları listeler |
+| `GET` | `/api/artists/{id}` | Sanatçı detayını getirir |
+| `GET` | `/api/albums` | Albümleri listeler |
+| `GET` | `/api/genres` | Türleri listeler |
+| `GET` | `/api/playlists` | Kullanıcının listelerini getirir |
+| `POST` | `/api/playlists` | Yeni çalma listesi oluşturur |
+| `GET` | `/api/users/me` | Kullanıcı profilini getirir |
+| `GET` | `/api/users/me/history` | Dinleme geçmişini getirir |
+| `POST` | `/api/subscription/upgrade` | Üyelik paketini yükseltir ve JWT'yi yeniler |
 
-## Demo hesaplar
+## Güvenlik Yaklaşımı
 
-| Kullanıcı | Parola | Paket |
+- JWT imzalama anahtarı kaynak kodunda tutulmaz.
+- Token üzerinde kullanıcı kimliği ve üyelik seviyesi claim'leri taşınır.
+- Korumalı API endpoint'leri JWT Bearer doğrulaması kullanır.
+- Parça yetkisi streaming isteği sırasında sunucu tarafında yeniden denetlenir.
+- MVC form işlemlerinde anti-forgery doğrulaması uygulanır.
+- Kullanıcı parolaları ASP.NET Core Identity ile hash'lenerek saklanır.
+- Veritabanı ve Data Protection anahtarları Git kapsamı dışında tutulur.
+- Yerel ses dosyaları yalnızca güvenli dosya adı çözümlemesi üzerinden sunulur.
+
+## Demo Hesapları
+
+| Kullanıcı adı | Parola | Paket |
 |---|---|---|
 | `basic` | `Music123` | Basic |
 | `gold` | `Music123` | Gold |
 | `premium` | `Music123` | Premium |
 | `elit` | `Music123` | Elit |
 
-Yeni kayıtlar rol ataması yapılmadan Basic paketle oluşturulur. Login yanıtındaki JWT, `package` claim'ini içerir. Üst paket kullanıcıları alt paket şarkılarını dinleyebilir; yetersiz paketle stream isteği `403 Forbidden` döndürür.
+Yeni kayıt olan kullanıcılar Basic paketle başlar. Demo hesapları, farklı üyelik seviyelerinin erişim matrisini hızlı biçimde test etmek için seed aşamasında oluşturulur.
 
-## Temel API akışı
+## API Testleri
 
-1. `POST /api/Register` ile kullanıcı oluşturun.
-2. `POST /api/Login` ile JWT alın.
-3. Swagger veya Postman'de `Authorization: Bearer <token>` başlığını ekleyin.
-4. `GET /api/songs` ile kataloğu alın.
-5. `GET /api/songs/{id}/stream` ile paket kontrolünden geçen resmi ses önizlemesini oynatın.
+[JwtMusic.postman_collection.json](JwtMusic.postman_collection.json) koleksiyonu; demo kullanıcıların JWT'lerini otomatik alır, şarkıları paket seviyelerine göre dinamik olarak seçer ve 16 kombinasyonlu yetkilendirme matrisini doğrular.
 
-Diğer uçlar: `/api/artists`, `/api/genres`, `/api/albums`, `/api/playlists`, `/api/users/me`, `/api/users/me/history`.
+## Lisans ve Atıf
 
-## Postman testleri
+Josh Woodward'a ait 20 tam uzunluktaki kayıt [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/) lisansıyla kullanılmaktadır. Kayıtlarda değişiklik yapılmamıştır.
 
-`JwtMusic.postman_collection.json` koleksiyonunu sırasıyla Collection Runner ile çalıştırın. Koleksiyon dört demo hesabın JWT'sini alır, şarkı kimliklerini paket seviyelerine göre API'den dinamik olarak bulur ve 16 kombinasyonlu paket yetki matrisini test eder. Bu nedenle veritabanındaki şarkı ID'lerinin `1` veya `2` olması gerekmez.
+Kaynak: [joshwoodward.com](https://www.joshwoodward.com/)
+
+Projenin kaynak kodu için ayrıca bir lisans belirtilmediği sürece tüm haklar saklıdır.
