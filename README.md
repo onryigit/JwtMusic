@@ -1,4 +1,4 @@
-# Reverb — JWT Tabanlı Müzik Platformu
+# 🎶 Reverb — JWT Tabanlı Müzik Platformu
 
 Reverb; kullanıcıların şarkı keşfedebildiği, sanatçı ve albümleri inceleyebildiği, çalma listeleri oluşturabildiği ve üyelik seviyelerine göre müzik dinleyebildiği modern bir müzik platformudur.
 
