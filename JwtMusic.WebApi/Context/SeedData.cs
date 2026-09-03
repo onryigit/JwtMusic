@@ -78,9 +78,34 @@ public static class SeedData
         new("Dark Paradise", "Lana Del Rey", "Alternative", "ABD", 1440830128)
     };
 
+    private static readonly FullLengthCatalogItem[] FullLengthCatalog =
+    {
+        new("A Thousand Years", "33⅓", "Rock", "josh-woodward-01.mp3", "/images/full-tracks/33.jpg", "AThousandYears", 211, new DateTime(2024, 12, 4)),
+        new("Circles", "33⅓", "Pop", "josh-woodward-02.mp3", "/images/full-tracks/33.jpg", "Circles", 202, new DateTime(2024, 12, 4)),
+        new("Wade", "33⅓", "Pop", "josh-woodward-03.mp3", "/images/full-tracks/33.jpg", "Wade", 185, new DateTime(2024, 12, 4)),
+        new("Synthia", "33⅓", "Rock", "josh-woodward-04.mp3", "/images/full-tracks/33.jpg", "Synthia", 175, new DateTime(2024, 12, 5)),
+        new("Truly", "33⅓", "Alternative", "josh-woodward-05.mp3", "/images/full-tracks/33.jpg", "Truly", 159, new DateTime(2024, 12, 5)),
+        new("33⅓", "33⅓", "Alternative", "josh-woodward-06.mp3", "/images/full-tracks/33.jpg", "33", 170, new DateTime(2024, 12, 5)),
+        new("Time for the Past", "33⅓", "Rock", "josh-woodward-07.mp3", "/images/full-tracks/33.jpg", "TimeforthePast", 211, new DateTime(2024, 12, 5)),
+        new("Willow, Willow", "33⅓", "Alternative", "josh-woodward-08.mp3", "/images/full-tracks/33.jpg", "WillowWillow", 184, new DateTime(2024, 12, 6)),
+        new("Almost No Regrets", "33⅓", "Rock", "josh-woodward-09.mp3", "/images/full-tracks/33.jpg", "AlmostNoRegrets", 265, new DateTime(2024, 12, 6)),
+        new("Flotsam", "33⅓", "Rock", "josh-woodward-10.mp3", "/images/full-tracks/33.jpg", "Flotsam", 182, new DateTime(2024, 12, 6)),
+        new("I Will Not Let You Let Me Down", "The Wake", "Rock", "josh-woodward-11.mp3", "/images/full-tracks/the-wake.jpg", "IWillNotLetYouLetMeDown", 181, new DateTime(2012, 8, 21)),
+        new("This Is Everything", "The Wake", "Rock", "josh-woodward-12.mp3", "/images/full-tracks/the-wake.jpg", "ThisIsEverything", 206, new DateTime(2012, 8, 21)),
+        new("Hollow Grove", "The Wake", "Rock", "josh-woodward-13.mp3", "/images/full-tracks/the-wake.jpg", "HollowGrove", 235, new DateTime(2012, 8, 21)),
+        new("Crazy Glue", "The Wake", "Alternative", "josh-woodward-14.mp3", "/images/full-tracks/the-wake.jpg", "CrazyGlue", 164, new DateTime(2012, 8, 21)),
+        new("Lafayette", "The Wake", "Alternative", "josh-woodward-15.mp3", "/images/full-tracks/the-wake.jpg", "Lafayette", 303, new DateTime(2012, 8, 21)),
+        new("Oh Mallory", "The Wake", "Rock", "josh-woodward-16.mp3", "/images/full-tracks/the-wake.jpg", "OhMallory", 196, new DateTime(2012, 8, 21)),
+        new("Invisible Light", "The Wake", "Rock", "josh-woodward-17.mp3", "/images/full-tracks/the-wake.jpg", "InvisibleLight", 250, new DateTime(2012, 8, 21)),
+        new("Water in the Creek", "The Wake", "Alternative", "josh-woodward-18.mp3", "/images/full-tracks/the-wake.jpg", "WaterintheCreek", 183, new DateTime(2012, 8, 21)),
+        new("Little Tomcat", "The Wake", "Alternative", "josh-woodward-19.mp3", "/images/full-tracks/the-wake.jpg", "LittleTomcat", 197, new DateTime(2012, 8, 21)),
+        new("Golden Sunrise", "The Wake", "Rock", "josh-woodward-20.mp3", "/images/full-tracks/the-wake.jpg", "GoldenSunrise", 251, new DateTime(2012, 8, 21))
+    };
+
     public static async Task InitializeAsync(JwtContext context, UserManager<AppUser> userManager)
     {
         await EnsureUsersAsync(userManager);
+        await EnsureFullLengthCatalogAsync(context);
 
         var existingSongs = await context.Songs.Include(x => x.Artist).ToListAsync();
         var missingItems = Catalog.Where(item => existingSongs.All(song => !CatalogMatches(song, item))).ToList();
@@ -154,12 +179,80 @@ public static class SeedData
                 StoreUrl = track.TrackViewUrl,
                 Duration = TimeSpan.FromSeconds(30),
                 ReleaseDate = track.ReleaseDate,
-                Lyrics = "Bu sayfada eserin resmi 30 saniyelik önizlemesi sunulmaktadır."
+                Lyrics = string.Empty
             });
         }
 
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
+    }
+
+    private static async Task EnsureFullLengthCatalogAsync(JwtContext context)
+    {
+        var genres = await context.Genres.ToListAsync();
+        foreach (var name in FullLengthCatalog.Select(x => x.Genre).Distinct()
+                     .Where(name => genres.All(x => x.Name != name)))
+        {
+            var genre = new Genre { Name = name };
+            genres.Add(genre);
+            context.Genres.Add(genre);
+        }
+
+        var artist = await context.Artists.Include(x => x.Songs)
+            .SingleOrDefaultAsync(x => x.ArtistName == "Josh Woodward");
+        if (artist is null)
+        {
+            artist = new Artist
+            {
+                ArtistName = "Josh Woodward",
+                Country = "ABD",
+                Bio = "Creative Commons lisanslı bağımsız müzik sanatçısı.",
+                ArtistImageUrl = "/images/full-tracks/33.jpg",
+                CoverImageUrl = "/images/full-tracks/the-wake.jpg",
+                CreatedDate = DateTime.UtcNow,
+                IsVerified = true
+            };
+            context.Artists.Add(artist);
+        }
+
+        var albums = await context.Albums.Include(x => x.Artist)
+            .Where(x => x.Artist.ArtistName == "Josh Woodward")
+            .ToDictionaryAsync(x => x.Name);
+        foreach (var source in FullLengthCatalog)
+        {
+            if (!albums.TryGetValue(source.Album, out var album))
+            {
+                album = new Album
+                {
+                    Name = source.Album,
+                    Artist = artist,
+                    CoverImageUrl = source.CoverImageUrl,
+                    ReleaseDate = source.ReleaseDate
+                };
+                albums.Add(source.Album, album);
+                context.Albums.Add(album);
+            }
+
+            if (artist.Songs.Any(x => Normalize(x.SongName) == Normalize(source.Title))) continue;
+            var song = new Song
+            {
+                SongName = source.Title,
+                Artist = artist,
+                Album = album,
+                Genre = genres.First(x => x.Name == source.Genre),
+                RequiredTier = MembershipTier.Basic,
+                CoverImageUrl = source.CoverImageUrl,
+                AudioUrl = source.AudioFileName,
+                StoreUrl = $"https://www.joshwoodward.com/song/{source.SourceSlug}",
+                Duration = TimeSpan.FromSeconds(source.DurationSeconds),
+                ReleaseDate = source.ReleaseDate,
+                Lyrics = string.Empty
+            };
+            artist.Songs.Add(song);
+            context.Songs.Add(song);
+        }
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task<List<ResolvedCatalogItem>> ResolveCatalogAsync(IReadOnlyCollection<CatalogItem> items)
@@ -262,6 +355,8 @@ public static class SeedData
     }
 
     private sealed record CatalogItem(string Title, string Artist, string Genre, string Country, long? StoreId = null);
+    private sealed record FullLengthCatalogItem(string Title, string Album, string Genre, string AudioFileName,
+        string CoverImageUrl, string SourceSlug, int DurationSeconds, DateTime ReleaseDate);
     private sealed record ResolvedCatalogItem(CatalogItem Source, ItunesTrack Track);
     private sealed class ItunesResponse { public List<ItunesTrack> Results { get; set; } = new(); }
     private sealed class ItunesTrack

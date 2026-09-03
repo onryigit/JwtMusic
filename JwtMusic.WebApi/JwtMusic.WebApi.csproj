@@ -28,4 +28,8 @@
     <Compile Remove="Migrations\**\*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Audio\**\*.mp3" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
