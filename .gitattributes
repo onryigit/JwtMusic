@@ -61,3 +61,15 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+###############################################################################
+# GitHub Linguist Overrides (Force C#)
+###############################################################################
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+*.json linguist-detectable=false
+
+wwwroot/** linguist-vendored
+
+*.cshtml linguist-language=C#
+
