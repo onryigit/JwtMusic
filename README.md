@@ -93,7 +93,7 @@ Katalog iki farklı ses kaynağını birlikte destekler:
 
 Tam uzunluktaki kayıtlar proje içerisinde barındırılır ve ASP.NET Core `PhysicalFile` sonucu ile `enableRangeProcessing` etkin şekilde sunulur. Böylece tarayıcı parçayı tamamen indirmeden oynatabilir ve zaman çizelgesi üzerinde ileri-geri sarma yapabilir.
 
-Her tam parçanın detay sayfasında sanatçı, kaynak sayfası ve lisans bağlantısı gösterilir. Ayrıntılı atıf bilgileri [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) dosyasında bulunur.
+Her tam parçanın detay sayfasında sanatçı, kaynak sayfası ve lisans bağlantısı gösterilir. Lisans ve atıf bilgileri bu README'nin sonunda ayrıca belirtilmiştir.
 
 ## Öneri Sistemi
 
@@ -135,7 +135,6 @@ JwtMusic/
 │   ├── Views/                  # Razor arayüzleri
 │   └── wwwroot/                # CSS, JavaScript ve görseller
 ├── JwtMusic.postman_collection.json
-├── THIRD-PARTY-NOTICES.md
 └── JwtMusic.slnx
 ```
 
