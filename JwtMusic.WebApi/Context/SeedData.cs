@@ -71,7 +71,11 @@ public static class SeedData
         new("Clair de Lune", "Claude Debussy", "Classical", "Fransa"),
         new("Levels", "Avicii", "Electronic", "İsveç"),
         new("Titanium", "David Guetta", "Electronic", "Fransa"),
-        new("Get Lucky", "Daft Punk", "Electronic", "Fransa")
+        new("Get Lucky", "Daft Punk", "Electronic", "Fransa"),
+        new("Born to Die", "Lana Del Rey", "Alternative", "ABD", 1440829978),
+        new("Video Games", "Lana Del Rey", "Alternative", "ABD", 1440830118),
+        new("Summertime Sadness", "Lana Del Rey", "Alternative", "ABD", 1440830261),
+        new("Dark Paradise", "Lana Del Rey", "Alternative", "ABD", 1440830128)
     };
 
     public static async Task InitializeAsync(JwtContext context, UserManager<AppUser> userManager)
@@ -85,7 +89,7 @@ public static class SeedData
         var resolved = await ResolveCatalogAsync(missingItems);
         if (resolved.Count != missingItems.Count)
             throw new InvalidOperationException(
-                $"Eksik {missingItems.Count} Apple Music parçasından yalnızca {resolved.Count} tanesi bulunabildi. " +
+                $"Eksik {missingItems.Count}  şarkılardan yalnızca {resolved.Count} tanesi bulunabildi. " +
                 "Katalog değiştirilmedi; internet bağlantınızı kontrol edip API'yi yeniden başlatın.");
 
         await using var transaction = await context.Database.BeginTransactionAsync();
@@ -192,7 +196,7 @@ public static class SeedData
                     response.EnsureSuccessStatusCode();
                 }
 
-                // Apple Search API yaklaşık 20 istek/dakika ile sınırlıdır.
+
                 await Task.Delay(TimeSpan.FromMilliseconds(3100));
             }
 

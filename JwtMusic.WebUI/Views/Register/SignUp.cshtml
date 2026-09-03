@@ -4,14 +4,14 @@
 <html lang="tr">
 <head>
     <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hesap oluştur · Bepop</title>
+    <title>Hesap oluştur · Reverb</title>
     <link rel="stylesheet" href="~/Bepop/assets/css/bootstrap.css" /><link rel="stylesheet" href="~/Bepop/assets/css/theme.css" /><link rel="stylesheet" href="~/Bepop/assets/css/style.css" /><link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="layout-row bg-dark auth-body">
 <main class="auth-shell">
-    <section class="auth-art"><div class="auth-art-shade"><a class="navbar-brand text-white" asp-controller="Login" asp-action="SignIn"><span class="brand-record">B</span> Bepop</a><div><span class="eyebrow">KEŞFETMEYE BAŞLA</span><h1>Sana eşlik edecek<br />şarkıları bul.</h1><p>Yeni müzikler keşfet, kendi çalma listelerini hazırla ve dinleme geçmişini tek yerde tut.</p></div><small>Kişisel kütüphane · Akıllı öneriler · Her an yanında</small></div></section>
+    <section class="auth-art"><div class="auth-art-shade"><a class="navbar-brand text-white" asp-controller="Login" asp-action="SignIn"><partial name="_Brand" /></a><div><span class="eyebrow">KEŞFETMEYE BAŞLA</span><h1>Sana eşlik edecek<br />şarkıları bul.</h1><p>Yeni müzikler keşfet, kendi çalma listelerini hazırla ve dinleme geçmişini tek yerde tut.</p></div><small>Kişisel kütüphane · Akıllı öneriler · Her an yanında</small></div></section>
     <section class="auth-form-panel"><div class="auth-card auth-card-wide">
-        <h2>Hesap oluştur</h2><p class="text-muted mb-4">Birkaç adımda Bepop'a katıl.</p>
+        <h2>Hesap oluştur</h2><p class="text-muted mb-4">Birkaç adımda Reverb’e katıl.</p>
         <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"></div>
         <form method="post">
             <div class="form-row"><div class="form-group col"><label asp-for="Name">Ad</label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger small"></span></div><div class="form-group col"><label asp-for="Surname">Soyad</label><input asp-for="Surname" class="form-control" /><span asp-validation-for="Surname" class="text-danger small"></span></div></div>

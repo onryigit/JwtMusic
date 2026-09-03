@@ -1,7 +1,8 @@
 @model HomeViewModel
-@{ ViewData["Title"] = "Keşfet"; var hero = Model.Songs.FirstOrDefault()?.CoverImageUrl; }
+@{ ViewData["Title"] = "Keşfet"; const string heroCover = "/images/born-to-die-paradise-edition.jpg"; }
 <div class="page-container py-5">
-    <section class="hero-panel media bg-media mb-5" style="background-image:url('@hero')">
+    <section class="hero-panel mb-5" style="--hero-art:url('@heroCover')">
+        <img class="hero-album-art" src="@heroCover" alt="Lana Del Rey — Born to Die: The Paradise Edition albüm kapağı" />
         <div class="hero-shade"><span class="eyebrow">YENİ BİR ŞEYLER KEŞFET</span><h1>Günün ritmini burada bul.</h1><p>Türkiye'den ve dünyadan sevilen şarkıların resmi önizlemelerini dinle, koleksiyonunu oluştur.</p><a href="#catalog" class="btn auth-submit align-self-start">Dinlemeye başla</a></div>
     </section>
     <div id="catalog" class="d-flex flex-wrap align-items-center justify-content-between mb-4">
@@ -18,10 +19,10 @@
                 <article class="song-card">
                     <a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="media media-1x1"><span class="media-content" style="background-image:url('@song.CoverImageUrl')"></span></a>
                     <button class="play-fab js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl" aria-label="@song.SongName şarkısını çal"><i data-feather="play" width="18"></i></button>
-                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold d-block text-truncate">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small text-truncate">@song.ArtistName</a><div class="card-meta"><span class="badge badge-package package-@song.RequiredPackage.ToLowerInvariant()">@song.RequiredPackage</span><a class="store-link" href="@song.StoreUrl" target="_blank" rel="noopener">Apple Music ↗</a></div></div>
+                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold d-block text-truncate">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small text-truncate">@song.ArtistName</a><div class="card-meta"><span class="badge badge-package package-@song.RequiredPackage.ToLowerInvariant()">@song.RequiredPackage</span><a class="store-link" href="@song.StoreUrl" target="_blank" rel="noopener">Music ↗</a></div></div>
                 </article>
             </div>
         }
     </div>
-    <p class="catalog-credit">Şarkı önizlemeleri ve albüm görselleri Apple Music aracılığıyla sunulur.</p>
+    <p class="catalog-credit">Designed by Yiğit Öner</p>
 </div>
