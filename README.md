@@ -4,8 +4,6 @@ Reverb; kullanıcıların şarkı keşfedebildiği, sanatçı ve albümleri ince
 
 Proje, birbirinden ayrılmış **ASP.NET Core Web API** ve **ASP.NET Core MVC** uygulamalarından oluşur. Kullanıcı kimliği ve üyelik bilgileri JWT claim'leriyle taşınırken katalog, dinleme geçmişi ve kişisel listeler Entity Framework Core üzerinden yönetilir.
 
-> Bu proje M&Y Yazılım Eğitim Akademi Danışmanlık bünyesinde, Murat Yücedağ'ın mentörlüğünde geliştirilmiştir.
-
 ## Öne Çıkan Özellikler
 
 - JWT tabanlı kayıt, giriş ve yetkilendirme
