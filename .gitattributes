@@ -6,10 +6,19 @@
 ###############################################################################
 # GitHub Linguist Overrides (Force 100% C#)
 ###############################################################################
-# 1. Repodaki her şeyi dil istatistiğinden hariç tut
-* linguist-vendored
+# 1. Tüm alt klasörleri ve dosyaları istatistikten düşür
+** linguist-vendored
 
-# 2. Sadece C# ve Razor dosyalarını istatistiğe aç
+# 2. Frontend uzantılarını kökten tespit edilemez yap
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.scss linguist-detectable=false
+*.sass linguist-detectable=false
+*.less linguist-detectable=false
+*.js linguist-detectable=false
+*.json linguist-detectable=false
+
+# 3. Yalnızca C# ve cshtml dosyalarını istatistiğe dahil et
 *.cs linguist-vendored=false
 *.cs linguist-detectable=true
 
