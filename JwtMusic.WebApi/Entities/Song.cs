@@ -18,7 +18,8 @@
 
         public DateTime ReleaseDate { get; set; }
 
-        public PackageLevel RequiredPackage { get; set; }
+        [System.ComponentModel.DataAnnotations.Schema.Column("RequiredPackage")]
+        public MembershipTier RequiredTier { get; set; } = MembershipTier.Basic;
         public string Lyrics { get; set; } = string.Empty;
 
         public int ArtistId { get; set; }

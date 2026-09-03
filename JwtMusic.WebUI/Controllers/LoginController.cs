@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
-using System.Text.Json;
 using JwtMusic.WebUI.Dtos;
+using JwtMusic.WebUI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JwtMusic.WebUI.Controllers;
@@ -43,9 +43,7 @@ public class LoginController : Controller
             return View(dto);
         }
 
-        HttpContext.Session.SetString("JwtToken", token.Token);
-        HttpContext.Session.SetString("Username", dto.Username);
-        StorePackageClaim(token.Token);
+        JwtSessionManager.Store(HttpContext, token.Token, dto.Username);
         return RedirectToAction("Index", "Home");
     }
 
@@ -56,18 +54,4 @@ public class LoginController : Controller
         return RedirectToAction(nameof(SignIn));
     }
 
-    private void StorePackageClaim(string token)
-    {
-        try
-        {
-            var payload = token.Split('.')[1].Replace('-', '+').Replace('_', '/');
-            payload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
-            using var json = JsonDocument.Parse(Convert.FromBase64String(payload));
-            if (json.RootElement.TryGetProperty("package", out var package))
-                HttpContext.Session.SetString("Package", package.GetString() ?? "Basic");
-            if (json.RootElement.TryGetProperty("fullName", out var name))
-                HttpContext.Session.SetString("FullName", name.GetString() ?? string.Empty);
-        }
-        catch (Exception) { HttpContext.Session.SetString("Package", "Basic"); }
-    }
 }

@@ -1,0 +1,86 @@
+@model PricingViewModel
+@{
+    ViewData["Title"] = "Paketler";
+    var plans = new[]
+    {
+        new { Tier = 1, Name = "Basic", Price = "Ücretsiz", Description = "Müziği keşfetmeye başla.", Accent = "#77809a", Features = new[] { "Standart kalitede şarkılar", "128 kbps ses kalitesi", "Kişisel listeler ve geçmiş" } },
+        new { Tier = 2, Name = "Gold", Price = "$4.99", Description = "Favori türlerinde daha fazlası.", Accent = "#e8b84a", Features = new[] { "Pop & Rock şarkılarına tam erişim", "Basic paketin tüm özellikleri", "Kesintisiz katalog keşfi" } },
+        new { Tier = 3, Name = "Premium", Price = "$9.99", Description = "Kataloğun tamamı seninle.", Accent = "#9b7cf6", Features = new[] { "Tüm müzik kataloğuna erişim", "320 kbps yüksek kalite", "Gelişmiş müzik deneyimi" } },
+        new { Tier = 4, Name = "Elit", Price = "$14.99", Description = "Reverb’ün en üst deneyimi.", Accent = "#e46cb9", Features = new[] { "Sınırsız katalog erişimi", "Kayıpsız Hi-Fi ses", "Tüm ayrıcalıklara erişim" } }
+    };
+}
+
+<div class="page-container pricing-page py-5">
+    <header class="pricing-hero text-center mb-5">
+        <span class="eyebrow">SESİNİ YÜKSELT</span>
+        <h1>Sana uygun Reverb paketini seç.</h1>
+        <p>Aktif paketin <strong id="active-plan-name">@Model.CurrentTierName</strong>. İstediğin zaman daha üst bir deneyime geç.</p>
+    </header>
+
+    @Html.AntiForgeryToken()
+    <div id="pricing-alert" class="pricing-alert d-none" role="status"></div>
+    <div class="row pricing-grid">
+        @foreach (var plan in plans)
+        {
+            var isCurrent = plan.Tier == Model.CurrentTier;
+            var isLower = plan.Tier < Model.CurrentTier;
+            <div class="col-md-6 col-xl-3 mb-4">
+                <article class="pricing-card @(isCurrent ? "is-current" : "")" style="--plan-accent:@plan.Accent">
+                    @if (plan.Tier == 3) { <span class="popular-badge">EN POPÜLER</span> }
+                    <div class="pricing-card-head">
+                        <span class="plan-orb"></span>
+                        <h2>@plan.Name</h2>
+                        <p>@plan.Description</p>
+                    </div>
+                    <div class="plan-price">@plan.Price @if (plan.Tier > 1) { <small>/ ay</small> }</div>
+                    <ul>
+                        @foreach (var feature in plan.Features) { <li><i data-feather="check" width="17"></i><span>@feature</span></li> }
+                    </ul>
+                    @if (isCurrent)
+                    {
+                        <button class="btn plan-button current" disabled>Mevcut Paketiniz</button>
+                    }
+                    else if (isLower)
+                    {
+                        <button class="btn plan-button included" disabled>Paketinize Dahil</button>
+                    }
+                    else
+                    {
+                        <button class="btn plan-button js-upgrade-plan" data-tier="@plan.Tier" data-name="@plan.Name">Yükselt</button>
+                    }
+                </article>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.js-upgrade-plan').forEach(button => button.addEventListener('click', async () => {
+    const alertBox = document.getElementById('pricing-alert');
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Güncelleniyor…';
+    alertBox.classList.add('d-none');
+    try {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const response = await fetch('@Url.Action("Upgrade", "Subscription")', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+            body: JSON.stringify({ newTier: Number(button.dataset.tier) })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Paket güncellenemedi.');
+        localStorage.setItem('reverb.jwt', result.token);
+        alertBox.textContent = result.message;
+        alertBox.className = 'pricing-alert success';
+        setTimeout(() => window.location.reload(), 650);
+    } catch (error) {
+        alertBox.textContent = error.message;
+        alertBox.className = 'pricing-alert error';
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}));
+</script>
+}

@@ -24,9 +24,9 @@ public class SongsController : Controller
         using var response = await _api.StreamAsync(id);
         if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
             return StatusCode(403, await response.Content.ReadAsStringAsync());
-        if ((int)response.StatusCode is >= 300 and < 400 && response.Headers.Location is not null)
-            return Json(new { streamUrl = response.Headers.Location.ToString() });
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
+        if (response.Content.Headers.ContentType?.MediaType?.Contains("json", StringComparison.OrdinalIgnoreCase) == true)
+            return Content(await response.Content.ReadAsStringAsync(), "application/json");
         return File(await response.Content.ReadAsByteArrayAsync(), "audio/mpeg", enableRangeProcessing: true);
     }
 }

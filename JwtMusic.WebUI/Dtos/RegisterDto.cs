@@ -12,5 +12,7 @@
         public string Email { get; set; } = string.Empty;
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Parola zorunludur."), System.ComponentModel.DataAnnotations.MinLength(6, ErrorMessage = "Parola en az 6 karakter olmalıdır.")]
         public string Password { get; set; } = string.Empty;
+        [System.ComponentModel.DataAnnotations.Range(1, 4, ErrorMessage = "Geçerli bir paket seçin.")]
+        public int PlanTier { get; set; } = 1;
     }
 }

@@ -79,7 +79,7 @@ public class CatalogController : ControllerBase
     {
         var id = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var profile = await _context.Users.AsNoTracking().Where(x => x.Id == id)
-            .Select(x => new ProfileDto(x.Id, x.UserName!, x.Name, x.Surname, x.Email!, x.PackageLevel)).SingleAsync();
+            .Select(x => new ProfileDto(x.Id, x.UserName!, x.Name, x.Surname, x.Email!, x.PlanTier)).SingleAsync();
         return Ok(profile);
     }
 
@@ -91,6 +91,6 @@ public class CatalogController : ControllerBase
         x.CoverImageUrl, x.Bio, x.Country, x.IsVerified, x.Songs.Select(ToSongDto).ToList());
 
     private static SongDto ToSongDto(Song x) => new(x.SongId, x.SongName, x.CoverImageUrl, x.StoreUrl, x.Duration,
-        x.ListenCount, x.ReleaseDate, x.RequiredPackage, x.Lyrics, x.ArtistId, x.Artist.ArtistName,
+        x.ListenCount, x.ReleaseDate, x.RequiredTier, x.Lyrics, x.ArtistId, x.Artist.ArtistName,
         x.AlbumId, x.Album.Name, x.GenreId, x.Genre.Name);
 }

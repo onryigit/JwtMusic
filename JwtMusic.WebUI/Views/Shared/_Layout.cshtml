@@ -28,9 +28,10 @@
                         <a class="nav-link" asp-controller="Library" asp-action="Albums">Albümler</a>
                         <a class="nav-link" asp-controller="Library" asp-action="Playlists">Listelerim</a>
                         <a class="nav-link" asp-controller="Library" asp-action="History">Geçmiş</a>
+                        <a class="nav-link" asp-controller="Subscription" asp-action="Pricing">Paketler</a>
                     </nav>
-                    <div class="user-chip ml-auto"><span class="package-dot"></span><div><strong>@(Context.Session.GetString("FullName") ?? Context.Session.GetString("Username"))</strong><small>@(Context.Session.GetString("Package") ?? "Basic")</small></div></div>
-                    <form asp-controller="Login" asp-action="Logout" method="post" class="ml-3"><button class="btn btn-sm btn-outline-light" type="submit">Çıkış</button></form>
+                    <div class="user-chip ml-auto"><span class="package-dot"></span><div><strong>@(Context.Session.GetString("FullName") ?? Context.Session.GetString("Username"))</strong><small>@(Context.Session.GetString("PlanTierName") ?? "Basic")</small></div></div>
+                    <form asp-controller="Login" asp-action="Logout" method="post" class="ml-3 js-logout-form"><button class="btn btn-sm btn-outline-light" type="submit">Çıkış</button></form>
                 </div>
             }
         </div>
@@ -40,12 +41,30 @@
     @if (Context.Session.GetString("JwtToken") is not null)
     {
         <section id="music-player" class="player-bar d-none">
-            <img id="player-cover" alt="Albüm kapağı" />
-            <div class="player-meta"><strong id="player-title">—</strong><span id="player-artist">—</span><small>Önizleme Apple Music aracılığıyla sunulur.</small></div>
-            <audio id="audio-player" controls preload="none"></audio>
+            <div class="player-track-info">
+                <img id="player-cover" alt="Albüm kapağı" />
+                <div class="player-meta"><strong id="player-title">—</strong><span id="player-artist">—</span><small>Apple Music önizlemesi</small></div>
+            </div>
+            <div class="player-center">
+                <div class="player-controls">
+                    <button type="button" id="player-previous" class="player-icon-button" aria-label="Önceki şarkı"><i data-feather="skip-back"></i></button>
+                    <button type="button" id="player-toggle" class="player-toggle" aria-label="Oynat"><i data-feather="play"></i></button>
+                    <button type="button" id="player-next" class="player-icon-button" aria-label="Sonraki şarkı"><i data-feather="skip-forward"></i></button>
+                </div>
+                <div class="player-timeline">
+                    <time id="player-elapsed">0:00</time>
+                    <input id="player-progress" class="player-range" type="range" min="0" max="100" value="0" step="0.01" aria-label="Şarkı konumu" />
+                    <time id="player-duration">0:00</time>
+                </div>
+            </div>
+            <div class="player-volume">
+                <button type="button" id="player-mute" class="player-icon-button" aria-label="Sesi kapat"><i data-feather="volume-2"></i></button>
+                <input id="player-volume" class="player-range" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Ses seviyesi" />
+            </div>
+            <audio id="audio-player" preload="metadata"></audio>
         </section>
         <div id="packageModal" class="package-modal" aria-hidden="true">
-            <div class="package-dialog"><button type="button" class="modal-x" data-close-modal aria-label="Kapat">×</button><span class="lock-icon"><i data-feather="lock"></i></span><h3>Bu parça paketine dahil değil</h3><p id="packageMessage">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</p><button class="btn auth-submit" data-close-modal>Tamam</button></div>
+            <div class="package-dialog"><button type="button" class="modal-x" data-close-modal aria-label="Kapat">×</button><span class="lock-icon"><i data-feather="lock"></i></span><h3>Bu parça paketine dahil değil</h3><p id="packageMessage">Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin.</p><div class="package-actions"><a class="btn auth-submit" asp-controller="Subscription" asp-action="Pricing">Paketleri İncele / Yükselt</a><button class="btn btn-outline-light" data-close-modal>Şimdi Değil</button></div></div>
         </div>
     }
     <script src="~/Bepop/libs/jquery/dist/jquery.min.js"></script>

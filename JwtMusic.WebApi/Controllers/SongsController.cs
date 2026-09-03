@@ -63,8 +63,11 @@ public class SongsController : ControllerBase
     {
         var song = await _context.Songs.FindAsync(id);
         if (song is null) return NotFound();
-        var package = Enum.TryParse<PackageLevel>(User.FindFirstValue("package"), out var value) ? value : PackageLevel.Basic;
-        if (package < song.RequiredPackage)
+        var userPlanTier = int.TryParse(User.FindFirstValue("PlanTier"), out var tierValue)
+            && Enum.IsDefined(typeof(MembershipTier), tierValue)
+            ? (MembershipTier)tierValue
+            : MembershipTier.Basic;
+        if (userPlanTier < song.RequiredTier)
             return StatusCode(StatusCodes.Status403Forbidden, new { message = "Mevcut paketiniz bu şarkıyı desteklememektedir. Lütfen paketinizi yükseltin." });
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -72,13 +75,13 @@ public class SongsController : ControllerBase
         song.ListenCount++;
         await _context.SaveChangesAsync();
         if (Uri.TryCreate(song.AudioUrl, UriKind.Absolute, out var previewUrl) && previewUrl.Scheme == Uri.UriSchemeHttps)
-            return Redirect(previewUrl.ToString());
+            return Ok(new { streamUrl = previewUrl.ToString() });
 
         var path = Path.Combine(_environment.ContentRootPath, "Audio", Path.GetFileName(song.AudioUrl));
         return System.IO.File.Exists(path) ? PhysicalFile(path, "audio/mpeg", enableRangeProcessing: true) : NotFound();
     }
 
     internal static IQueryable<SongDto> Project(IQueryable<Song> query) => query.Select(x => new SongDto(
-        x.SongId, x.SongName, x.CoverImageUrl, x.StoreUrl, x.Duration, x.ListenCount, x.ReleaseDate, x.RequiredPackage,
+        x.SongId, x.SongName, x.CoverImageUrl, x.StoreUrl, x.Duration, x.ListenCount, x.ReleaseDate, x.RequiredTier,
         x.Lyrics, x.ArtistId, x.Artist.ArtistName, x.AlbumId, x.Album.Name, x.GenreId, x.Genre.Name));
 }

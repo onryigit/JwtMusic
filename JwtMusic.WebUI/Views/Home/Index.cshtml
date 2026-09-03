@@ -19,7 +19,7 @@
                 <article class="song-card">
                     <a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="media media-1x1"><span class="media-content" style="background-image:url('@song.CoverImageUrl')"></span></a>
                     <button class="play-fab js-play" data-id="@song.SongId" data-title="@song.SongName" data-artist="@song.ArtistName" data-cover="@song.CoverImageUrl" aria-label="@song.SongName şarkısını çal"><i data-feather="play" width="18"></i></button>
-                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold d-block text-truncate">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small text-truncate">@song.ArtistName</a><div class="card-meta"><span class="badge badge-package package-@song.RequiredPackage.ToLowerInvariant()">@song.RequiredPackage</span><a class="store-link" href="@song.StoreUrl" target="_blank" rel="noopener">Music ↗</a></div></div>
+                    <div class="pt-3"><a asp-controller="Songs" asp-action="Detail" asp-route-id="@song.SongId" class="text-white font-weight-bold d-block text-truncate">@song.SongName</a><a asp-controller="Artist" asp-action="Detail" asp-route-id="@song.ArtistId" class="d-block text-muted small text-truncate">@song.ArtistName</a><div class="card-meta"><span class="badge badge-package package-@song.RequiredTier.ToLowerInvariant()">@song.RequiredTier</span><a class="store-link" href="@song.StoreUrl" target="_blank" rel="noopener">Music ↗</a></div></div>
                 </article>
             </div>
         }

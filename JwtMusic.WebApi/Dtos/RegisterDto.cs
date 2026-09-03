@@ -12,5 +12,7 @@
         public string Username { get; set; } = string.Empty;
         [System.ComponentModel.DataAnnotations.Required, System.ComponentModel.DataAnnotations.MinLength(6)]
         public string Password { get; set; } = string.Empty;
+        [System.ComponentModel.DataAnnotations.EnumDataType(typeof(Entities.MembershipTier))]
+        public Entities.MembershipTier PlanTier { get; set; } = Entities.MembershipTier.Basic;
     }
 }

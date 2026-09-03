@@ -1,11 +1,8 @@
 ﻿using JwtMusic.WebApi.Dtos;
 using JwtMusic.WebApi.Entities;
 using JwtMusic.WebApi.Services.LoginServices;
+using JwtMusic.WebApi.Services.TokenServices;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace JwtMusic.WebApi.Services.LoginServices
 {
@@ -13,13 +10,13 @@ namespace JwtMusic.WebApi.Services.LoginServices
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly IJwtTokenService _tokenService;
 
-        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration)
+        public LoginService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJwtTokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
+            _tokenService = tokenService;
         }
 
         public async Task<string?> LoginAsync(LoginDto loginDto)
@@ -41,34 +38,7 @@ namespace JwtMusic.WebApi.Services.LoginServices
                 return null;
             }
 
-            return await GenerateToken(user);
-        }
-
-        private async Task<string> GenerateToken(AppUser appUser)
-        {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
-                new Claim(ClaimTypes.Email, appUser.Email ?? string.Empty),
-                new Claim(ClaimTypes.Name, appUser.UserName ?? string.Empty),
-                new Claim("fullName", $"{appUser.Name} {appUser.Surname}".Trim()),
-                new Claim(ClaimTypes.Surname, appUser.Surname),
-                new Claim("package", appUser.PackageLevel.ToString())
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpireMinutes"]!)),
-                signingCredentials: credentials
-            );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return _tokenService.CreateToken(user);
         }
     }
 }

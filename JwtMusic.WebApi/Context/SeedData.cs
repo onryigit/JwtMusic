@@ -148,7 +148,7 @@ public static class SeedData
                 Artist = artist,
                 Album = album,
                 Genre = genres.First(x => x.Name == source.Genre),
-                RequiredPackage = (PackageLevel)(Array.IndexOf(Catalog, source) % 4),
+                RequiredTier = (MembershipTier)(Array.IndexOf(Catalog, source) % 4 + 1),
                 CoverImageUrl = track.ArtworkUrl,
                 AudioUrl = track.PreviewUrl,
                 StoreUrl = track.TrackViewUrl,
@@ -242,7 +242,7 @@ public static class SeedData
 
     private static async Task EnsureUsersAsync(UserManager<AppUser> userManager)
     {
-        foreach (var package in Enum.GetValues<PackageLevel>())
+        foreach (var package in Enum.GetValues<MembershipTier>())
         {
             var username = package.ToString().ToLowerInvariant();
             if (await userManager.FindByNameAsync(username) is not null) continue;
@@ -253,7 +253,7 @@ public static class SeedData
                 Name = package.ToString(),
                 Surname = "Kullanıcı",
                 ImageUrl = string.Empty,
-                PackageLevel = package
+                PlanTier = package
             };
             var result = await userManager.CreateAsync(user, "Music123");
             if (!result.Succeeded)

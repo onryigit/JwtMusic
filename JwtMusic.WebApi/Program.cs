@@ -3,6 +3,7 @@ using JwtMusic.WebApi.Context;
 using JwtMusic.WebApi.Entities;
 using JwtMusic.WebApi.Services.LoginServices;
 using JwtMusic.WebApi.Services.RegisterServices;
+using JwtMusic.WebApi.Services.TokenServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
@@ -87,6 +89,20 @@ using (var scope = app.Services.CreateScope())
             alter.CommandText = "ALTER TABLE Songs ADD COLUMN StoreUrl TEXT NOT NULL DEFAULT ''";
             await alter.ExecuteNonQueryAsync();
         }
+    }
+    foreach (var (table, column) in new[]
+             {
+                 ("AspNetUsers", "PackageLevel"),
+                 ("Songs", "RequiredPackage")
+             })
+    {
+        await using var legacyCheck = connection.CreateCommand();
+        legacyCheck.CommandText = $"SELECT COUNT(*) FROM {table} WHERE {column} = 0";
+        if (Convert.ToInt32(await legacyCheck.ExecuteScalarAsync()) == 0) continue;
+
+        await using var normalize = connection.CreateCommand();
+        normalize.CommandText = $"UPDATE {table} SET {column} = {column} + 1";
+        await normalize.ExecuteNonQueryAsync();
     }
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     await SeedData.InitializeAsync(context, userManager);

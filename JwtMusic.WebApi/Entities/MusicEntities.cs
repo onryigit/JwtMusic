@@ -1,6 +1,12 @@
 namespace JwtMusic.WebApi.Entities;
 
-public enum PackageLevel { Basic, Gold, Premium, Elit }
+public enum MembershipTier
+{
+    Basic = 1,
+    Gold = 2,
+    Premium = 3,
+    Elit = 4
+}
 
 public class Genre
 {
